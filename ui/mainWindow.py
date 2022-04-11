@@ -2,6 +2,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from utils.UIUtils import *
+from ui.logLevelTabFrame import LogLevelTabFrame
+from module.levelModule import LevelModule
 
 class MainWindow(QMainWindow):
 
@@ -33,7 +35,7 @@ class MainWindow(QMainWindow):
         self.verticalLayout_main.setContentsMargins(0, 10, 0, 10)
         self.horizontalLayout_device = QHBoxLayout()
         self.horizontalLayout_device.setObjectName(u"horizontalLayout_device")
-        self.horizontalLayout_device.setContentsMargins(10, 0, 10, -1)
+        self.horizontalLayout_device.setContentsMargins(10, 0, 10, 0)
         self.label_device = QLabel(self.verticalLayoutWidget)
         self.label_device.setObjectName(u"label_device")
 
@@ -71,6 +73,11 @@ class MainWindow(QMainWindow):
         self.tabWidget_main.setObjectName(u"tabWidget_main")
         self.tab_log_level = QWidget()
         self.tab_log_level.setObjectName(u"tab_log_level")
+        print(self.tab_log_level.frameGeometry())
+        self.level_tab_frame = LogLevelTabFrame(LevelModule(), self.tab_log_level)
+        self.level_tab_frame.setGeometry(QRect(0,0,22, 30))
+        self.level_tab_frame.setFrameShape(QFrame.StyledPanel)
+        self.level_tab_frame.setFrameShadow(QFrame.Raised)
         self.tabWidget_main.addTab(self.tab_log_level, "")
         self.tabWidget_main.setCurrentWidget(self.tab_log_level)
         self.tab_log_pull = QWidget()
