@@ -3,8 +3,9 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from utils.UIUtils import *
 from ui.logLevelTabFrame import LogLevelTabFrame
+from ui.logPullTabFrame import LogPullTabFrame
 from module.levelModule import LevelModule
-
+from module.pullModule import PullModule
 from utils.Utils import *
 
 class MainWindow(QMainWindow):
@@ -75,7 +76,6 @@ class MainWindow(QMainWindow):
         self.tabWidget_main = QTabWidget(self.verticalLayoutWidget)
         self.tabWidget_main.setObjectName(u"tabWidget_main")
         self.tab_log_level = QWidget()
-        IF_Print("tab size = [%d %d]" % (self.tab_log_level.size().width(), self.tab_log_level.size().height()))
         self.tab_log_level.setObjectName(u"tab_log_level")
         self.level_tab_frame = LogLevelTabFrame(LevelModule(), self.tab_log_level)
         self.level_tab_frame.setFrameShape(QFrame.StyledPanel)
@@ -84,6 +84,9 @@ class MainWindow(QMainWindow):
         self.tabWidget_main.setCurrentWidget(self.tab_log_level)
         self.tab_log_pull = QWidget()
         self.tab_log_pull.setObjectName(u"tab_log_pull")
+        self.log_pull_frame = LogPullTabFrame(PullModule(), self.tab_log_pull)
+        self.log_pull_frame.setFrameShape(QFrame.StyledPanel)
+        self.log_pull_frame.setFrameShadow(QFrame.Raised)
         self.tabWidget_main.addTab(self.tab_log_pull, "")
 
         self.verticalLayout_main.addWidget(self.tabWidget_main)
@@ -110,10 +113,7 @@ class MainWindow(QMainWindow):
 
         self.retranslateUi(MainWindow)
 
-
         QMetaObject.connectSlotsByName(MainWindow)
-        geo = self.tab_log_level.size()
-        IF_Print("level_tab geo = [%d, %d]" % (geo.width(), geo.height()))
     # setupUi
 
     def show(self):
@@ -122,6 +122,8 @@ class MainWindow(QMainWindow):
         statusBarSize = self.statusbar.size()
         self.level_tab_frame.setGeometry(QRect(0, 0, levelTabGeo.width(), levelTabGeo.height() - statusBarSize.height() - 10))
         self.level_tab_frame.layout()
+        self.log_pull_frame.setGeometry(QRect(0, 0, levelTabGeo.width(), levelTabGeo.height() - statusBarSize.height() - 10))
+        self.log_pull_frame.layout()
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"adb logcat tool", None))

@@ -1,4 +1,4 @@
-from toolModule import ToolModule
+from module.toolModule import ToolModule
 
 
 class PullModule(ToolModule):
