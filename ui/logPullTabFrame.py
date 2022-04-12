@@ -2,6 +2,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from ui.tabFrame import TabFrame
+from ui.dropLineEditor import DropLineEditor
 from utils.Utils import *
 from utils.defines import *
 
@@ -69,7 +70,7 @@ class LogPullTabFrame(TabFrame):
 
         self.horizontalLayout_save_pull = QHBoxLayout()
         self.horizontalLayout_save_pull.setObjectName(u"horizontalLayout_save_pull")
-        self.lineEdit_save_pull = QLineEdit(self)
+        self.lineEdit_save_pull = DropLineEditor(self)
         self.lineEdit_save_pull.setObjectName(u"lineEdit_save_pull")
         self.lineEdit_save_pull.setAlignment(Qt.AlignCenter)
 
@@ -85,7 +86,7 @@ class LogPullTabFrame(TabFrame):
 
         self.horizontalLayout_src = QHBoxLayout()
         self.horizontalLayout_src.setObjectName(u"horizontalLayout_src")
-        self.lineEdit_src = QLineEdit(self)
+        self.lineEdit_src = DropLineEditor(self)
         self.lineEdit_src.setObjectName(u"lineEdit_src")
         self.lineEdit_src.setAlignment(Qt.AlignCenter)
 
@@ -101,7 +102,7 @@ class LogPullTabFrame(TabFrame):
 
         self.horizontalLayout_dst = QHBoxLayout()
         self.horizontalLayout_dst.setObjectName(u"horizontalLayout_dst")
-        self.lineEdit_dst = QLineEdit(self)
+        self.lineEdit_dst = DropLineEditor(self)
         self.lineEdit_dst.setObjectName(u"lineEdit_dst")
         self.lineEdit_dst.setAlignment(Qt.AlignCenter)
 
