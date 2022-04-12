@@ -106,6 +106,16 @@ class LogLevelTabFrame(TabFrame):
 
         self.horizontalLayout_check.addWidget(self.checkBox_offlinelog)
 
+        self.checkBox_drq = QCheckBox(self)
+        self.checkBox_drq.setObjectName(u"checkBox_drq")
+
+        self.horizontalLayout_check.addWidget(self.checkBox_drq)
+
+        self.checkBox_metadata = QCheckBox(self)
+        self.checkBox_metadata.setObjectName(u"checkBox_metadata")
+
+        self.horizontalLayout_check.addWidget(self.checkBox_metadata)
+
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_check.addItem(self.horizontalSpacer)
@@ -130,10 +140,10 @@ class LogLevelTabFrame(TabFrame):
 
         self.horizontalLayout_buttons = QHBoxLayout()
         self.horizontalLayout_buttons.setObjectName(u"horizontalLayout_buttons")
-        self.pushButton_6 = QPushButton(self)
-        self.pushButton_6.setObjectName(u"pushButton_6")
+        self.pushButton_reset = QPushButton(self)
+        self.pushButton_reset.setObjectName(u"pushButton_reset")
 
-        self.horizontalLayout_buttons.addWidget(self.pushButton_6)
+        self.horizontalLayout_buttons.addWidget(self.pushButton_reset)
 
         self.pushButton_clear = QPushButton(self)
         self.pushButton_clear.setObjectName(u"pushButton_clear")
@@ -159,20 +169,22 @@ class LogLevelTabFrame(TabFrame):
     # setupUi
 
     def retranslateUi(self):
-        self.label_group.setText(QCoreApplication.translate("tabFrame", u"Group", None))
-        self.pushButton_group_reset.setText(QCoreApplication.translate("tabFrame", u"\u91cd\u7f6e", None))
-        self.pushButton_group_select_all.setText(QCoreApplication.translate("tabFrame", u"\u5168\u9009", None))
-        self.label_mask.setText(QCoreApplication.translate("tabFrame", u"Mask", None))
-        self.pushButton_mask_reset.setText(QCoreApplication.translate("tabFrame", u"\u91cd\u7f6e", None))
-        self.pushButton_mask_select_all.setText(QCoreApplication.translate("tabFrame", u"\u5168\u9009", None))
+        self.label_group.setText(QCoreApplication.translate("TabFrame", u"Group", None))
+        self.pushButton_group_reset.setText(QCoreApplication.translate("TabFrame", u"\u91cd\u7f6e", None))
+        self.pushButton_group_select_all.setText(QCoreApplication.translate("TabFrame", u"\u5168\u9009", None))
+        self.label_mask.setText(QCoreApplication.translate("TabFrame", u"Mask", None))
+        self.pushButton_mask_reset.setText(QCoreApplication.translate("TabFrame", u"\u91cd\u7f6e", None))
+        self.pushButton_mask_select_all.setText(QCoreApplication.translate("TabFrame", u"\u5168\u9009", None))
         self.lineEdit_mask_search.setPlaceholderText(
-            QCoreApplication.translate("tabFrame", u"\u8bf7\u8f93\u5165\u5b8c\u6574mask", None))
-        self.pushButton_mask_search.setText(QCoreApplication.translate("tabFrame", u"\u641c\u7d22", None))
-        self.checkBox_systemlog.setText(QCoreApplication.translate("tabFrame", u"System Log", None))
-        self.checkBox_offlinelog.setText(QCoreApplication.translate("tabFrame", u"Offline Log", None))
-        self.label_preview.setText(QCoreApplication.translate("tabFrame", u"\u9884\u89c8", None))
-        self.pushButton_6.setText(QCoreApplication.translate("tabFrame", u"\u8bfb\u53d6\u8bbe\u5907\u9884\u8bbe", None))
-        self.pushButton_clear.setText(QCoreApplication.translate("tabFrame", u"\u6e05\u9664\u8bbe\u5907\u9884\u8bbe", None))
-        self.pushButton_apply.setText(QCoreApplication.translate("tabFrame", u"\u5e94\u7528", None))
+            QCoreApplication.translate("TabFrame", u"\u8bf7\u8f93\u5165\u5b8c\u6574mask", None))
+        self.pushButton_mask_search.setText(QCoreApplication.translate("TabFrame", u"\u641c\u7d22", None))
+        self.checkBox_systemlog.setText(QCoreApplication.translate("TabFrame", u"System Log", None))
+        self.checkBox_offlinelog.setText(QCoreApplication.translate("TabFrame", u"Offline Log", None))
+        self.checkBox_drq.setText(QCoreApplication.translate("TabFrame", u"DRQ Log", None))
+        self.checkBox_metadata.setText(QCoreApplication.translate("TabFrame", u"Metadata Log", None))
+        self.label_preview.setText(QCoreApplication.translate("TabFrame", u"\u9884\u89c8", None))
+        self.pushButton_reset.setText(QCoreApplication.translate("TabFrame", u"\u8bfb\u53d6\u8bbe\u5907\u9884\u8bbe", None))
+        self.pushButton_clear.setText(QCoreApplication.translate("TabFrame", u"\u6e05\u9664\u8bbe\u5907\u9884\u8bbe", None))
+        self.pushButton_apply.setText(QCoreApplication.translate("TabFrame", u"\u5e94\u7528", None))
     # retranslateUi
 
