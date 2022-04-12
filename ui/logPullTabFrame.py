@@ -2,10 +2,13 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from ui.tabFrame import TabFrame
+from utils.Utils import *
+from utils.defines import *
 
 class LogPullTabFrame(TabFrame):
     def __init__(self, module, parent=None):
         super().__init__(module, parent)
+        self.__workingType = 1 << WORKING_TYPE_PULL_AND_MERGE
 
     def layout(self):
         self.verticalLayout = QVBoxLayout(self)
@@ -132,6 +135,8 @@ class LogPullTabFrame(TabFrame):
 
 
         self.retranslateUi()
+        self.__connectUI()
+        self.__updateUIForWorkingType()
 
         QMetaObject.connectSlotsByName(self)
     # setupUi
@@ -147,7 +152,37 @@ class LogPullTabFrame(TabFrame):
         self.pushButton_src.setText(QCoreApplication.translate("TabFrame", u"\u9009\u62e9\u76ee\u5f55", None))
         self.lineEdit_dst.setPlaceholderText(QCoreApplication.translate("TabFrame", u"\u9009\u62e9/\u8f93\u5165/\u62d6\u5165 \u5408\u5e76log\u4fdd\u5b58\u8def\u5f84", None))
         self.pushButton_dst.setText(QCoreApplication.translate("TabFrame", u"\u9009\u62e9\u76ee\u5f55", None))
-        self.pushButton_run.setText(QCoreApplication.translate("TabFrame", u"\u62c9\u53d6\u5e76\u5408\u5e76", None))
+
     # retranslateUi
+
+    def __connectUI(self):
+        self.radioButton_pull.clicked.connect(self.__onTypeSelected)
+        self.radioButton_merge.clicked.connect(self.__onTypeSelected)
+        self.checkBox_save_pull.clicked.connect(self.__onTypeSelected)
+
+    def __onTypeSelected(self):
+        if self.sender() == self.radioButton_pull:
+            self.__workingType = 1 << WORKING_TYPE_PULL_AND_MERGE
+        elif self.sender() == self.radioButton_merge:
+            self.__workingType = 1 << WORKING_TYPE_MERGE
+        elif self.sender() == self.checkBox_save_pull:
+            if self.checkBox_save_pull.isChecked():
+                self.__workingType |= 1 << WORKING_TYPE_PULL_AND_SAVE
+            else:
+                self.__workingType &= ~(1 << WORKING_TYPE_PULL_AND_SAVE)
+        IF_Print("onTypeSelected: ", self.__workingType)
+        self.__updateUIForWorkingType()
+
+    def __updateUIForWorkingType(self):
+        self.checkBox_save_pull.setEnabled(self.__workingType & 1 << WORKING_TYPE_PULL_AND_MERGE)
+        self.label_save_pull.setEnabled(self.__workingType & 1 << WORKING_TYPE_PULL_AND_MERGE)
+        self.lineEdit_save_pull.setEnabled(self.__workingType & 1 << WORKING_TYPE_PULL_AND_SAVE)
+        self.pushButton_save_pull.setEnabled(self.__workingType & 1 << WORKING_TYPE_PULL_AND_SAVE)
+        self.lineEdit_src.setEnabled(self.__workingType & 1 << WORKING_TYPE_MERGE)
+        self.pushButton_src.setEnabled(self.__workingType & 1 << WORKING_TYPE_MERGE)
+        if self.__workingType & 1 << WORKING_TYPE_PULL_AND_MERGE:
+            self.pushButton_run.setText(QCoreApplication.translate("TabFrame", u"拉取并合并", None))
+        elif self.__workingType & 1 << WORKING_TYPE_MERGE:
+            self.pushButton_run.setText(QCoreApplication.translate("TabFrame", u"开始合并", None))
 
 
