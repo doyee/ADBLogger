@@ -57,6 +57,8 @@ class ADBManager(object):
             cmd = "%s -s %s shell getprop ro.product.model" % (self.__adbPath, tmp[0])
             IF_Print(cmd)
             name = RunCmdAndReturn(cmd)[:-2]
+            if name.count("adb.exe") > 0:
+                name = "UNKNOWN"
             info[DEVICE_INFO_NAME] = name
             self.__deviceInfo.append(info)
 

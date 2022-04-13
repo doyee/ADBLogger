@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
         self.__deviceInfo = []
         displaySize = GetWindowSize()
         self.setupUi(self, (displaySize[0] / 3, displaySize[1] * 3 / 5))
-        self.__updateDevice(refresh=True)
+        self.__updateDevice()
 
     def setupUi(self, MainWindow, windowSize):
         if not MainWindow.objectName():
@@ -178,6 +178,7 @@ class MainWindow(QMainWindow):
         # menu
         self.action_log_level_settings.triggered.connect(self.__onMenu)
         self.action_general_settings.triggered.connect(self.__onMenu)
+        self.action_refresh_device_list.triggered.connect(self.__onMenu)
 
         self.device_changed.connect(self.__onUSBStateChanged)
 
@@ -186,11 +187,13 @@ class MainWindow(QMainWindow):
             self.__parserDialog.show()
         elif self.sender() == self.action_general_settings:
             self.__generalSettingDialog.show()
+        elif self.sender() == self.action_refresh_device_list:
+            self.__updateDevice()
 
-    def __updateDevice(self, delay=0, refresh=False):
+    def __updateDevice(self, delay=0):
         sleep(delay)
 
-        self.__deviceInfo = self.__adbManager.GetDeviceInfo(refresh)
+        self.__deviceInfo = self.__adbManager.GetDeviceInfo(True)
         self.comboBox_device_list.clear()
         if not self.__deviceInfo == None:
             infos = []
@@ -210,7 +213,7 @@ class MainWindow(QMainWindow):
         self.__adbManager.SetSelectedDevice(currentSelected)
 
     def __onUSBStateChanged(self):
-        self.__updateDevice(delay=0.5, refresh=True)
+        self.__updateDevice(delay=0.5)
 
     def nativeEvent(self, eventType, message):
         retval, result = super().nativeEvent(eventType, message)
