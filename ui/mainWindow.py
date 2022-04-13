@@ -1,6 +1,8 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+
+from module.adbManager import ADBManager
 from utils.UIUtils import *
 from ui.logLevelTabFrame import LogLevelTabFrame
 from ui.logPullTabFrame import LogPullTabFrame
@@ -12,6 +14,10 @@ class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
+        hasAdb = ADBManager.get_instance().CheckADB()
+        if not hasAdb:
+            ShowMessageDialog(MESSAGE_TYPE_ADB_ERROR_QUIT)
+            exit(0)
         displaySize = GetWindowSize()
         self.setupUi(self, (displaySize[0] / 3, displaySize[1] * 3 / 5))
 

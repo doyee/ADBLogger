@@ -1,8 +1,7 @@
-from utils.defines import *
+import io
 
-UI_VERSION = "1.0.0.0"
-MODULE_VERSION = "1.0.0.0"
-DB_VERSION = 1
+from utils.defines import *
+import subprocess
 
 def IF_Print(*args, sep=' ', end='\n', file=None):
     if DEBUG_PRINT:
@@ -10,3 +9,15 @@ def IF_Print(*args, sep=' ', end='\n', file=None):
 
 def GetVersionStr():
     return "Version[UI:%s  Mod:%s  db:%d]" % (UI_VERSION, MODULE_VERSION, DB_VERSION)
+
+def RunCmdAndReturn(cmd):
+    proc = subprocess.Popen(cmd,
+                            shell=True,
+                            stdout=subprocess.PIPE,
+                            stdin=subprocess.PIPE,
+                            stderr=subprocess.STDOUT,
+                            bufsize=0,
+                            start_new_session=True,
+                            close_fds=True)
+    result = io.TextIOWrapper(proc.stdout).read()
+    return result
