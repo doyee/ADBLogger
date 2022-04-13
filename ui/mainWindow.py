@@ -1,3 +1,5 @@
+from time import sleep
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -14,16 +16,22 @@ from module.logLevelParser import LogLevelParser
 from module.generalSetings import GeneralSettings
 from utils.Utils import *
 
+TITLE_PREFIX = "adb logcat tool"
+
 class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
-        hasAdb = ADBManager.get_instance().CheckADB()
+        self.__adbManager = ADBManager.get_instance()
+        hasAdb = self.__adbManager.CheckADB()
         if not hasAdb:
             ShowMessageDialog(MESSAGE_TYPE_ADB_ERROR_QUIT)
             exit(0)
+
+        self.__deviceInfo = []
         displaySize = GetWindowSize()
         self.setupUi(self, (displaySize[0] / 3, displaySize[1] * 3 / 5))
+        self.__updateDevice(refresh=True)
 
     def setupUi(self, MainWindow, windowSize):
         if not MainWindow.objectName():
@@ -148,7 +156,7 @@ class MainWindow(QMainWindow):
         self.log_pull_frame.layout()
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"adb logcat tool", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", TITLE_PREFIX, None))
         self.action_general_settings.setText(QCoreApplication.translate("MainWindow", u"\u901a\u7528\u8bbe\u7f6e", None))
         self.action_log_level_settings.setText(QCoreApplication.translate("MainWindow", u"\u89e3\u6790log\u7b49\u7ea7\u8bbe\u7f6e", None))
         self.action_refresh_device_list.setText(QCoreApplication.translate("MainWindow", u"\u5237\u65b0\u8bbe\u5907\u5217\u8868", None))
@@ -172,3 +180,24 @@ class MainWindow(QMainWindow):
             self.__parserDialog.show()
         elif self.sender() == self.action_general_settings:
             self.__generalSettingDialog.show()
+
+    def __updateDevice(self, delay=0, refresh=False):
+        sleep(delay)
+        self.__deviceInfo = self.__adbManager.GetDeviceInfo(refresh)
+        self.comboBox_device_list.clear()
+        if not self.__deviceInfo == None:
+            infos = []
+            for info in self.__deviceInfo:
+                infoStr = " %s: %s \t [Status:%s]" % (info[DEVICE_INFO_NAME], info[DEVICE_INFO_ID], info[DEVICE_INFO_STATUS])
+                infos.append(infoStr)
+            self.comboBox_device_list.addItems(infos)
+        self.__onDeviceChanged()
+
+    def __onDeviceChanged(self):
+        currentSelected = self.comboBox_device_list.currentIndex()
+        if currentSelected == -1:
+            title = TITLE_PREFIX
+        else:
+            title = "%s - %s (%s)" % (TITLE_PREFIX, self.__deviceInfo[currentSelected][DEVICE_INFO_ID], self.__deviceInfo[currentSelected][DEVICE_INFO_STATUS])
+        self.setWindowTitle(QCoreApplication.translate("MainWindow", title, None))
+        self.__adbManager.SetSelectedDevice(currentSelected)

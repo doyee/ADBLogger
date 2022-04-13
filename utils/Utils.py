@@ -1,4 +1,4 @@
-import io
+import io, os
 
 from utils.defines import *
 import subprocess
@@ -21,3 +21,7 @@ def RunCmdAndReturn(cmd):
                             close_fds=True)
     result = io.TextIOWrapper(proc.stdout).read()
     return result
+
+def RunCmdAndReturnList(cmd):
+    result = os.popen(cmd)
+    return result.read().splitlines()
