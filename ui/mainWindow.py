@@ -1,5 +1,8 @@
+from ctypes import wintypes
 from time import sleep
 
+import win32con
+from PyQt5 import QtCore
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -19,6 +22,7 @@ from utils.Utils import *
 TITLE_PREFIX = "adb logcat tool"
 
 class MainWindow(QMainWindow):
+    device_changed = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
@@ -175,6 +179,8 @@ class MainWindow(QMainWindow):
         self.action_log_level_settings.triggered.connect(self.__onMenu)
         self.action_general_settings.triggered.connect(self.__onMenu)
 
+        self.device_changed.connect(self.__onUSBStateChanged)
+
     def __onMenu(self):
         if self.sender() == self.action_log_level_settings:
             self.__parserDialog.show()
@@ -183,6 +189,7 @@ class MainWindow(QMainWindow):
 
     def __updateDevice(self, delay=0, refresh=False):
         sleep(delay)
+
         self.__deviceInfo = self.__adbManager.GetDeviceInfo(refresh)
         self.comboBox_device_list.clear()
         if not self.__deviceInfo == None:
@@ -201,3 +208,15 @@ class MainWindow(QMainWindow):
             title = "%s - %s (%s)" % (TITLE_PREFIX, self.__deviceInfo[currentSelected][DEVICE_INFO_ID], self.__deviceInfo[currentSelected][DEVICE_INFO_STATUS])
         self.setWindowTitle(QCoreApplication.translate("MainWindow", title, None))
         self.__adbManager.SetSelectedDevice(currentSelected)
+
+    def __onUSBStateChanged(self):
+        self.__updateDevice(delay=0.5, refresh=True)
+
+    def nativeEvent(self, eventType, message):
+        retval, result = super().nativeEvent(eventType, message)
+        if eventType == "windows_generic_MSG":
+            msg = wintypes.MSG.from_address(message.__int__())
+            if msg.message == win32con.WM_DEVICECHANGE:
+                self.device_changed.emit()
+
+        return retval, result

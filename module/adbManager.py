@@ -32,6 +32,7 @@ class ADBManager(object):
 
     def GetDeviceInfo(self, refresh=False):
         if refresh:
+            self.__deviceInfo = []
             self.__adbDevices()
         return self.__deviceInfo
 
