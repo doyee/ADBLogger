@@ -7,9 +7,11 @@ from utils.UIUtils import *
 from ui.logLevelTabFrame import LogLevelTabFrame
 from ui.logPullTabFrame import LogPullTabFrame
 from ui.logLevelParsePanel import LogLevelParsePanel
+from ui.generalSettingPanel import GeneralSettingPanel
 from module.levelModule import LevelModule
 from module.pullModule import PullModule
 from module.logLevelParser import LogLevelParser
+from module.generalSetings import GeneralSettings
 from utils.Utils import *
 
 class MainWindow(QMainWindow):
@@ -120,10 +122,15 @@ class MainWindow(QMainWindow):
         self.menu_device.addAction(self.action_refresh_device_list)
 
         # setup setting panels
-        settingPanelSize = (windowSize[0] * 8 / 5, windowSize[1] / 2)
-        self.__parserDialog = LogLevelParsePanel(self, settingPanelSize, LogLevelParser())
-        self.__parserDialog.setupUi(self.__parserDialog)
+        parsePanelSize = (windowSize[0] * 8 / 5, windowSize[1] / 2)
+        self.__parserDialog = LogLevelParsePanel(self, parsePanelSize, LogLevelParser())
+        self.__parserDialog.setupUi()
         self.__parserDialog.setWindowModality(Qt.ApplicationModal)
+
+        generalSettingPanelSize = (windowSize[0] * 2 / 3, windowSize[1] / 2)
+        self.__generalSettingDialog = GeneralSettingPanel(self, generalSettingPanelSize, GeneralSettings())
+        self.__generalSettingDialog.setupUi()
+        self.__generalSettingDialog.setWindowModality(Qt.ApplicationModal)
 
         self.retranslateUi(MainWindow)
         self.__connectUi()
@@ -158,7 +165,10 @@ class MainWindow(QMainWindow):
 
         # menu
         self.action_log_level_settings.triggered.connect(self.__onMenu)
+        self.action_general_settings.triggered.connect(self.__onMenu)
 
     def __onMenu(self):
         if self.sender() == self.action_log_level_settings:
             self.__parserDialog.show()
+        elif self.sender() == self.action_general_settings:
+            self.__generalSettingDialog.show()

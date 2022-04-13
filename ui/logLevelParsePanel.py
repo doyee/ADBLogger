@@ -23,17 +23,17 @@ class LogLevelParsePanel(SettingDialog):
         super().__init__(parent, size)
         self.__module = module
 
-    def setupUi(self, Dialog):
+    def setupUi(self):
         self.__plainTextEdit_parser = QPlainTextEdit(self)
         self.__plainTextEdit_parser.setObjectName(u"plainTextEdit_parser")
 
         self._verticalLayout_main.addWidget(self.__plainTextEdit_parser)
 
-        super().setupUi(Dialog)
+        super().setupUi()
 
-    def retranslateUi(self, Dialog):
-        super().retranslateUi(Dialog)
-        Dialog.setWindowTitle(QCoreApplication.translate("SetingDialog", u"log等级解析", None))
+    def retranslateUi(self):
+        super().retranslateUi()
+        self.setWindowTitle(QCoreApplication.translate("SetingDialog", u"log等级解析", None))
         self.__plainTextEdit_parser.setPlaceholderText(QCoreApplication.translate("SetingDialog", PLACE_HOLDER_TEXT, None))
         self._pushButton_apply.setText(QCoreApplication.translate("SetingDialog", u"解析", None))
 

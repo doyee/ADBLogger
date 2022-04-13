@@ -9,19 +9,14 @@ class SettingDialog(QDialog):
 
     def __init__(self, parent, size):
         super(SettingDialog, self).__init__(parent)
-        self.__size = size
+        self.setWindowFlags(Qt.WindowTitleHint | Qt.CustomizeWindowHint | Qt.Dialog)
+        self.resize(size[0], size[1])
 
         self._verticalLayout_main = QVBoxLayout(self)
         self._verticalLayout_main.setObjectName(u"_verticalLayout_main")
         self._verticalLayout_main.setContentsMargins(10, 10, 10, 10)
 
-    def setupUi(self, Dialog):
-        if not Dialog.objectName():
-            Dialog.setObjectName(u"Dialog")
-        Dialog.resize(self.__size[0], self.__size[1])
-        # self.verticalLayoutWidget = QWidget(Dialog)
-        # self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
-        # self.verticalLayoutWidget.setGeometry(QRect(0, 0, self.__size[0], self.__size[1]))
+    def setupUi(self):
 
         self.__horizontalLayout_buttons = QHBoxLayout()
         self.__horizontalLayout_buttons.setObjectName(u"__horizontalLayout_buttons")
@@ -48,13 +43,13 @@ class SettingDialog(QDialog):
         self._verticalLayout_main.addLayout(self.__horizontalLayout_buttons)
 
 
-        self.retranslateUi(Dialog)
+        self.retranslateUi()
         self._connectUi()
 
-        QMetaObject.connectSlotsByName(Dialog)
+        QMetaObject.connectSlotsByName(self)
     # setupUi
 
-    def retranslateUi(self, Dialog):
+    def retranslateUi(self):
         self._pushButton_reset.setText(QCoreApplication.translate("SetingDialog", u"重置", None))
         self._pushButton_cancel.setText(QCoreApplication.translate("SetingDialog", u"取消", None))
 
@@ -84,8 +79,3 @@ class SettingDialog(QDialog):
     @abstractmethod
     def _cancel(self):
         pass
-
-
-    def closeEvent(self, a0):
-        self._reset()
-        super(SettingDialog, self).closeEvent(a0)
