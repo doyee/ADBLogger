@@ -2,6 +2,7 @@ from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtWidgets import QPlainTextEdit
 
 from ui.settingDialog import SettingDialog
+from utils.UIUtils import *
 
 PLACE_HOLDER_TEXT = \
 """请将log等级的定义粘贴至此进行解析。定义的位置可能位于camxdefs.h
@@ -13,7 +14,7 @@ static const CamxLogGroup CamxLogGroupSensor        = (static_cast<UINT64>(1) <<
 static const CamxLogGroup CamxLogGroupTracker       = (static_cast<UINT64>(1) << 2);    ///< Tracker
 static const CamxLogGroup CamxLogGroupISP           = (static_cast<UINT64>(1) << 3);    ///< ISP
 static const CamxLogGroup CamxLogGroupPProc         = (static_cast<UINT64>(1) << 4);    ///< Post Processor
-
+static const CamxLogGroup CamxLogGroupPProc2        = CamxLogGroupPProc            ;    ///< Post Processor
 ......
 """
 
@@ -44,3 +45,19 @@ class LogLevelParsePanel(SettingDialog):
     def _cancel(self):
         self._reset()
         self.close()
+
+    def _apply(self):
+        text = self.__plainTextEdit_parser.toPlainText()
+        if text == "":
+            ShowMessageDialog(MESSAGE_TYPE_PARSER_EMPTY_INPUT)
+            return
+
+        res = self.__module.Parse(text)
+        self.__ShowMessage(res)
+
+    def __ShowMessage(self, errorCode):
+        if errorCode == ERROR_CODE_SUCCESS:
+            ShowMessageDialog(MESSAGE_TYPE_SUCCESS)
+        elif errorCode == ERROR_CODE_INVALID_PARAM:
+            ShowMessageDialog(MESSAGE_TYPE_INVALID_PARAM)
+
