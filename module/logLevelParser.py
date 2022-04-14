@@ -1,5 +1,7 @@
 from utils.defines import *
 from utils.Utils import *
+from module.sqlManager import  *
+from module.table import *
 
 class LogLevelParser(object):
     def __init__(self):
@@ -8,6 +10,7 @@ class LogLevelParser(object):
 
     def Parse(self, str):
         self.__mask = {}
+        definitions = []
         lines = str.rsplit("\n")
         for line in lines:
             lineEnd = line.find(";")
@@ -28,6 +31,7 @@ class LogLevelParser(object):
                     if var.find(" "):
                         var = var.replace(" ", "")
                     self.__mask[definition] = self.__mask[var]
+                    definitions.append(definition)
                 else:
                     s_val = l_def[1][l_def[1].find("<<") + 2:]
                     s_val = s_val.replace(" ", "")
@@ -37,7 +41,8 @@ class LogLevelParser(object):
                     for char in s_val:
                         if char.isdigit():
                             val += char
-                    self.__mask[definition] = val
+                    self.__mask[definition] = int(val)
+                    definitions.append(definition)
 
             elif line == "":
                 continue
@@ -46,3 +51,21 @@ class LogLevelParser(object):
 
         IF_Print(self.__mask)
         # 4. store the result into db
+        sql = SQLManager.get_instance()
+        sql.DeleteTable(maskTable())
+        sql.CreateTable(maskTable())
+        if len(definitions) == 0:
+            return ERROR_CODE_INVALID_PARAM
+
+        idx = 0
+        for define in definitions:
+            insertInfo = SQLManager.InsertInfo()
+            insertInfo.Table = maskTable.Table
+            insertInfo.Headers = maskTable.Headers
+            insertInfo.Values = [idx, define, self.__mask[define]]
+            insertInfo.isChar = [False, True, False]
+            idx += 1
+            if sql.Insert(insertInfo) == ERROR_CODE_DB_INSERT_FAILED:
+                return ERROR_CODE_DB_INSERT_FAILED
+        return ERROR_CODE_SUCCESS
+

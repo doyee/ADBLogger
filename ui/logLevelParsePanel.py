@@ -60,4 +60,5 @@ class LogLevelParsePanel(SettingDialog):
             ShowMessageDialog(MESSAGE_TYPE_SUCCESS)
         elif errorCode == ERROR_CODE_INVALID_PARAM:
             ShowMessageDialog(MESSAGE_TYPE_INVALID_PARAM)
-
+        elif errorCode == ERROR_CODE_DB_INSERT_FAILED:
+            ShowMessageDialog(MESSAGE_TYPE_DB_INSERT_FAILED)

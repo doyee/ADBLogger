@@ -14,6 +14,7 @@ def ShowMessageDialog(msgType):
         messageBox.exec_()
     elif msgType == MESSAGE_TYPE_ADB_ERROR_QUIT:
         messageBox = QMessageBox(QMessageBox.Warning, "警告", "未找到有效的adb路径。请先将adb配置到PATH环境变量中。")
+        QMessageBox.warning()
         messageBox.addButton(u"关闭", QMessageBox.YesRole)
         messageBox.exec_()
     elif msgType == MESSAGE_TYPE_PARSER_EMPTY_INPUT:
@@ -22,5 +23,9 @@ def ShowMessageDialog(msgType):
         messageBox.exec_()
     elif msgType == MESSAGE_TYPE_INVALID_PARAM:
         messageBox = QMessageBox(QMessageBox.Warning, "警告", "无效的输入。请检查后重新输入。")
+        messageBox.addButton(u"关闭", QMessageBox.YesRole)
+        messageBox.exec_()
+    elif msgType == MESSAGE_TYPE_DB_INSERT_FAILED:
+        messageBox = QMessageBox(QMessageBox.Warning, "警告", "写入数据库失败。")
         messageBox.addButton(u"关闭", QMessageBox.YesRole)
         messageBox.exec_()

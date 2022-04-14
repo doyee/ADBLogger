@@ -12,7 +12,7 @@ from module.sqlManager import *
 from module.adbManager import *
 
 def launchCheck():
-    firtTimeFlag = False
+    firstTimeFlag = False
     # 1. check adb
     hasAdb = ADBManager.get_instance().CheckADB()
     if not hasAdb:
