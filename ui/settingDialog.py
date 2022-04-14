@@ -11,6 +11,8 @@ class SettingDialog(QDialog):
         super(SettingDialog, self).__init__(parent)
         self.setWindowFlags(Qt.WindowTitleHint | Qt.CustomizeWindowHint | Qt.Dialog)
         self.resize(size[0], size[1])
+        self.setMinimumSize(size[0], size[1])
+        self.setMaximumSize(size[0], size[1])
 
         self._verticalLayout_main = QVBoxLayout(self)
         self._verticalLayout_main.setObjectName(u"_verticalLayout_main")
@@ -79,3 +81,7 @@ class SettingDialog(QDialog):
     @abstractmethod
     def _cancel(self):
         pass
+
+    def closeEvent(self, a0):
+        self._reset()
+        super().closeEvent(a0)

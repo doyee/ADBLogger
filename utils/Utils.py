@@ -25,3 +25,17 @@ def RunCmdAndReturn(cmd):
 def RunCmdAndReturnList(cmd):
     result = os.popen(cmd)
     return result.read().splitlines()
+
+def IsPathExsist(path):
+    return os.path.exists(path)
+
+def GetAppDataDir():
+    return os.getenv('APPDATA')
+
+def Mkdir(path):
+    try:
+        os.mkdir(path)
+    except:
+        print("mkdir failed")
+        return False
+    return True

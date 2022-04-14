@@ -27,11 +27,6 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
         self.__adbManager = ADBManager.get_instance()
-        hasAdb = self.__adbManager.CheckADB()
-        if not hasAdb:
-            ShowMessageDialog(MESSAGE_TYPE_ADB_ERROR_QUIT)
-            exit(0)
-
         self.__deviceInfo = []
         displaySize = GetWindowSize()
         self.setupUi(self, (displaySize[0] / 3, displaySize[1] * 3 / 5))
@@ -150,7 +145,7 @@ class MainWindow(QMainWindow):
         QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
 
-    def show(self):
+    def show(self, isFirstTime):
         super().show()
         levelTabGeo = self.tab_log_level.geometry()
         statusBarSize = self.statusbar.size()
@@ -158,6 +153,8 @@ class MainWindow(QMainWindow):
         self.level_tab_frame.layout()
         self.log_pull_frame.setGeometry(QRect(0, 0, levelTabGeo.width(), levelTabGeo.height() - statusBarSize.height() - 10))
         self.log_pull_frame.layout()
+        if isFirstTime:
+            self.__parserDialog.show()
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", TITLE_PREFIX, None))

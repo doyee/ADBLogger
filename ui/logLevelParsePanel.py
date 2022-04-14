@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtWidgets import QPlainTextEdit
 
 from ui.settingDialog import SettingDialog
@@ -21,6 +21,7 @@ class LogLevelParsePanel(SettingDialog):
 
     def __init__(self, parent, size, module):
         super().__init__(parent, size)
+        self.setWindowFlags(Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.Dialog)
         self.__module = module
 
     def setupUi(self):

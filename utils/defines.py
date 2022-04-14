@@ -20,3 +20,6 @@ DB_VERSION = 1
 DEVICE_INFO_ID = "deviceId"
 DEVICE_INFO_NAME = "deviceName"
 DEVICE_INFO_STATUS = "deviceStatus"
+
+TOOLS_ROOT_DIR = "adbTools"
+TOOLS_DB_MANE = "adbTools.db"
