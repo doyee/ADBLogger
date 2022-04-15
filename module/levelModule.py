@@ -20,7 +20,7 @@ class LevelModule(ToolModule):
     def SelectGroup(self, group):
         if len(self.__selection) > 0 and group in self.__selection.keys():
             return False
-        self.__selection[group] = 0
+        self.__selection[group] = []
         return True
 
     def DropGroup(self, group):
@@ -33,10 +33,14 @@ class LevelModule(ToolModule):
             return False
 
     def SelectMask(self, group, mask):
-        self.__calculate(group, mask, False, group == LOG_GROUPS[0])
+        if len(self.__selection[group]) > 0 and mask in self.__selection[group]:
+            return
+        self.__selection[group].append(mask)
 
     def DropMask(self, group, mask):
-        self.__calculate(group, mask, True, group == LOG_GROUPS[0])
+        self.__selection[group].remove(mask)
+        if self.__selection[group] == None:
+            self.__selection[group] = []
 
     def GetGroups(self):
         return LOG_GROUPS
@@ -51,8 +55,8 @@ class LevelModule(ToolModule):
         selected = []
         for group in LOG_GROUPS:
             try:
-                value = self.__selection[group]
-                selected.append("%s=%#x" % (group, value))
+                masks = self.__selection[group]
+                selected.append("%s=%#x" % (group, self.__calculate(group == LOG_GROUPS[0], masks)))
             except:
                 pass
         return selected
@@ -72,16 +76,13 @@ class LevelModule(ToolModule):
             return masks, values
         return None
 
-    def __calculate(self, group, mask, isDrop, isOverrideLog):
-        value = self.__selection[group]
-        if isOverrideLog:
-            maskValue = OVERRIDE_LOG_MASK.index(mask)
-        else:
-            maskValue = self.__camxLogMasks[1][self.__camxLogMasks[0].index(mask)]
-        if isDrop:
-            value &= ~(1 << maskValue)
-        else:
+    def __calculate(self, isOverride, masks):
+        value = 0
+        for mask in masks:
+            if isOverride:
+                maskValue = OVERRIDE_LOG_MASK.index(mask)
+            else:
+                maskValue = self.__camxLogMasks[1][self.__camxLogMasks[0].index(mask)]
             value |= 1 << maskValue
-
-        self.__selection[group] = value
+        return value
 
