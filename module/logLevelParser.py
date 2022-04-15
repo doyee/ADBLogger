@@ -2,11 +2,13 @@ from utils.defines import *
 from utils.Utils import *
 from module.sqlManager import *
 from module.table import *
+from controller.logLevelParserListener import LogLevelParserListener
 
 class LogLevelParser(object):
-    def __init__(self):
+    def __init__(self, listener):
         self.__mask = {}
         self.__sqlManager = SQLManager.get_instance()
+        self.__parserListener = listener
         pass
 
     def Parse(self, str):
@@ -68,5 +70,6 @@ class LogLevelParser(object):
             idx += 1
             if self.__sqlManager.Insert(insertInfo) == ERROR_CODE_DB_INSERT_FAILED:
                 return ERROR_CODE_DB_INSERT_FAILED
+        self.__parserListener.onParseSuccess()
         return ERROR_CODE_SUCCESS
 

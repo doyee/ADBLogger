@@ -130,7 +130,7 @@ class MainWindow(QMainWindow):
 
         # setup setting panels
         parsePanelSize = (windowSize[0] * 8 / 5, windowSize[1] / 2)
-        self.__parserDialog = LogLevelParsePanel(self, parsePanelSize, LogLevelParser())
+        self.__parserDialog = LogLevelParsePanel(self, parsePanelSize, LogLevelParser(self.level_tab_frame))
         self.__parserDialog.setupUi()
         self.__parserDialog.setWindowModality(Qt.ApplicationModal)
 

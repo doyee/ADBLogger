@@ -2,11 +2,13 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+from controller.logLevelParserListener import LogLevelParserListener
 from ui.tabFrame import TabFrame
 from utils.Utils import *
 from utils.UIUtils import *
 
-class LogLevelTabFrame(TabFrame):
+
+class LogLevelTabFrame(TabFrame, LogLevelParserListener):
 
     def __init__(self, module, parent=None):
         super().__init__(module, parent)
@@ -36,14 +38,12 @@ class LogLevelTabFrame(TabFrame):
 
         self.horizontalLayout_group_heading.addWidget(self.pushButton_group_select_all)
 
-
         self.verticalLayout_group.addLayout(self.horizontalLayout_group_heading)
 
         self.listView_group = QListView(self)
         self.listView_group.setObjectName(u"listView_group")
         self.__fillMaskList()
         self.verticalLayout_group.addWidget(self.listView_group)
-
 
         self.horizontalLayout_settings.addLayout(self.verticalLayout_group)
 
@@ -65,7 +65,6 @@ class LogLevelTabFrame(TabFrame):
         self.pushButton_mask_select_all.setObjectName(u"pushButton_mask_select_all")
 
         self.horizontalLayout_mask_heading.addWidget(self.pushButton_mask_select_all)
-
 
         self.verticalLayout_mask.addLayout(self.horizontalLayout_mask_heading)
 
@@ -89,9 +88,7 @@ class LogLevelTabFrame(TabFrame):
 
         self.verticalLayout_mask.addWidget(self.listView_mask)
 
-
         self.horizontalLayout_settings.addLayout(self.verticalLayout_mask)
-
 
         self.verticalLayout_main.addLayout(self.horizontalLayout_settings)
 
@@ -160,7 +157,6 @@ class LogLevelTabFrame(TabFrame):
 
         self.horizontalLayout_buttons.addWidget(self.pushButton_apply)
 
-
         self.verticalLayout_main.addLayout(self.horizontalLayout_buttons)
 
         self._module.Update()
@@ -185,9 +181,12 @@ class LogLevelTabFrame(TabFrame):
         self.checkBox_drq.setText(QCoreApplication.translate("TabFrame", u"DRQ Log", None))
         self.checkBox_metadata.setText(QCoreApplication.translate("TabFrame", u"Metadata Log", None))
         self.label_preview.setText(QCoreApplication.translate("TabFrame", u"\u9884\u89c8", None))
-        self.pushButton_reset.setText(QCoreApplication.translate("TabFrame", u"\u8bfb\u53d6\u8bbe\u5907\u9884\u8bbe", None))
-        self.pushButton_clear.setText(QCoreApplication.translate("TabFrame", u"\u6e05\u9664\u8bbe\u5907\u9884\u8bbe", None))
+        self.pushButton_reset.setText(
+            QCoreApplication.translate("TabFrame", u"\u8bfb\u53d6\u8bbe\u5907\u9884\u8bbe", None))
+        self.pushButton_clear.setText(
+            QCoreApplication.translate("TabFrame", u"\u6e05\u9664\u8bbe\u5907\u9884\u8bbe", None))
         self.pushButton_apply.setText(QCoreApplication.translate("TabFrame", u"\u5e94\u7528", None))
+
     # retranslateUi
 
     def _connectUi(self):
@@ -217,14 +216,13 @@ class LogLevelTabFrame(TabFrame):
             selected = self._module.GetSelected()
             if len(selected) > 0:
                 FillupListView(self, self.listView_preview, selected)
-                
+
         elif self.sender() == self.listView_mask:
             group = self.listView_group.currentIndex().data()
             mask = self.listView_mask.currentIndex().data()
             self._module.SelectMask(group, mask)
             selected = self._module.GetSelected()
             FillupListView(self, self.listView_preview, selected)
-
 
     def __onListDoubleClicked(self):
         PaintListViewSelectionBackground(self.sender(), LIST_NORMAL_COLOR)
@@ -244,3 +242,9 @@ class LogLevelTabFrame(TabFrame):
             selected = self._module.GetSelected()
             FillupListView(self, self.listView_preview, selected)
 
+    def onParseSuccess(self):
+        self._module.Update()
+        self.listView_mask.setModel(None)
+        self.listView_group.setModel(None)
+        self.listView_preview.setModel(None)
+        self.__fillMaskList()
