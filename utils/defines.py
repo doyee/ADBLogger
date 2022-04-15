@@ -1,3 +1,5 @@
+from PyQt5.QtGui import QColor
+
 DEBUG_PRINT = True
 
 # ERROR CODE
@@ -31,3 +33,6 @@ DEVICE_INFO_STATUS = "deviceStatus"
 
 TOOLS_ROOT_DIR = "adbTools"
 TOOLS_DB_MANE = "adbTools.db"
+
+LIST_SELECTED_COLOR = QColor(0, 0, 255, 100)
+LIST_NORMAL_COLOR = QColor(255, 255, 255, 255)

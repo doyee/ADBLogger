@@ -135,14 +135,13 @@ class LogPullTabFrame(TabFrame):
         self.verticalLayout.addLayout(self.horizontalLayout_run)
 
 
-        self.retranslateUi()
-        self.__connectUI()
+        super().layout()
         self.__updateUIForWorkingType()
 
         QMetaObject.connectSlotsByName(self)
     # setupUi
 
-    def retranslateUi(self):
+    def _retranslateUi(self):
         self.radioButton_pull.setText(QCoreApplication.translate("TabFrame", u"\u4ece\u8bbe\u5907\u62c9\u53d6\u5e76\u5408\u5e76", None))
         self.radioButton_merge.setText(QCoreApplication.translate("TabFrame", u"\u5408\u5e76\u672c\u5730log", None))
         self.checkBox_save_pull.setText(QCoreApplication.translate("TabFrame", u"\u5c06\u62c9\u53d6\u7684log\u4fdd\u5b58\u5230\u6307\u5b9a\u76ee\u5f55", None))
@@ -156,7 +155,7 @@ class LogPullTabFrame(TabFrame):
 
     # retranslateUi
 
-    def __connectUI(self):
+    def _connectUi(self):
         self.radioButton_pull.clicked.connect(self.__onTypeSelected)
         self.radioButton_merge.clicked.connect(self.__onTypeSelected)
         self.checkBox_save_pull.clicked.connect(self.__onTypeSelected)

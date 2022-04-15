@@ -11,4 +11,13 @@ class TabFrame(QFrame):
 
     @abstractmethod
     def layout(self):
+        self._connectUi()
+        self._retranslateUi()
+
+    @abstractmethod
+    def _connectUi(self):
+        pass
+
+    @abstractmethod
+    def _retranslateUi(self):
         pass

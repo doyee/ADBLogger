@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 
 from ui.tabFrame import TabFrame
 from utils.Utils import *
+from utils.UIUtils import *
 
 class LogLevelTabFrame(TabFrame):
 
@@ -40,7 +41,7 @@ class LogLevelTabFrame(TabFrame):
 
         self.listView_group = QListView(self)
         self.listView_group.setObjectName(u"listView_group")
-
+        self.__fillMaskList()
         self.verticalLayout_group.addWidget(self.listView_group)
 
 
@@ -162,13 +163,14 @@ class LogLevelTabFrame(TabFrame):
 
         self.verticalLayout_main.addLayout(self.horizontalLayout_buttons)
 
-
-        self.retranslateUi()
+        self._module.Update()
+        super().layout()
 
         QMetaObject.connectSlotsByName(self)
+
     # setupUi
 
-    def retranslateUi(self):
+    def _retranslateUi(self):
         self.label_group.setText(QCoreApplication.translate("TabFrame", u"Group", None))
         self.pushButton_group_reset.setText(QCoreApplication.translate("TabFrame", u"\u91cd\u7f6e", None))
         self.pushButton_group_select_all.setText(QCoreApplication.translate("TabFrame", u"\u5168\u9009", None))
@@ -188,6 +190,57 @@ class LogLevelTabFrame(TabFrame):
         self.pushButton_apply.setText(QCoreApplication.translate("TabFrame", u"\u5e94\u7528", None))
     # retranslateUi
 
+    def _connectUi(self):
+        self.listView_group.clicked.connect(self.__onListClicked)
+        self.listView_group.doubleClicked.connect(self.__onListDoubleClicked)
+
+        self.listView_mask.clicked.connect(self.__onListClicked)
+        self.listView_mask.doubleClicked.connect(self.__onListDoubleClicked)
+
     def updateUI(self):
         pass
+
+    def __fillMaskList(self):
+        FillupListView(self, self.listView_group, self._module.GetGroups())
+
+    def __onListClicked(self):
+        PaintListViewSelectionBackground(self.sender(), LIST_SELECTED_COLOR)
+        if self.sender() == self.listView_group:
+            group = self.listView_group.currentIndex().data()
+            masks = self._module.GetMasksForGroup(group)
+            alreadyHas = not self._module.SelectGroup(group)
+            if alreadyHas:
+                return
+            if masks is not None:
+                FillupListView(self, self.listView_mask, masks)
+
+            selected = self._module.GetSelected()
+            if len(selected) > 0:
+                FillupListView(self, self.listView_preview, selected)
+                
+        elif self.sender() == self.listView_mask:
+            group = self.listView_group.currentIndex().data()
+            mask = self.listView_mask.currentIndex().data()
+            self._module.SelectMask(group, mask)
+            selected = self._module.GetSelected()
+            FillupListView(self, self.listView_preview, selected)
+
+
+    def __onListDoubleClicked(self):
+        PaintListViewSelectionBackground(self.sender(), LIST_NORMAL_COLOR)
+        if self.sender() == self.listView_group:
+            group = self.listView_group.currentIndex().data()
+            self._module.DropGroup(group)
+            selected = self._module.GetSelected()
+            if len(selected) > 0:
+                FillupListView(self, self.listView_preview, selected)
+            else:
+                self.listView_preview.setModel(None)
+            self.listView_mask.setModel(None)
+        elif self.sender() == self.listView_mask:
+            group = self.listView_group.currentIndex().data()
+            mask = self.listView_mask.currentIndex().data()
+            self._module.DropMask(group, mask)
+            selected = self._module.GetSelected()
+            FillupListView(self, self.listView_preview, selected)
 

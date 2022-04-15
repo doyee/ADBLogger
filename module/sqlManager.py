@@ -18,6 +18,11 @@ class SQLManager(object):
         Values = []
         isChar = []
 
+    class QueryInfo(object):
+        Table = ""
+        Columns = []
+        Conditions = ""
+
     def __init__(self):
         path = os.path.join(os.path.join(GetAppDataDir(), TOOLS_ROOT_DIR), TOOLS_DB_MANE)
         self.__db = sqlite3.connect(path)
@@ -70,4 +75,22 @@ class SQLManager(object):
             print("insertion error: %s" % query)
             return ERROR_CODE_DB_INSERT_FAILED
 
-
+    def Select(self, info):
+        query = """SELECT """
+        if len(info.Columns) == 0:
+            query += "* FROM %s" % info.Table
+        else:
+            for clm in info.Columns:
+                query += "%s," % clm
+            query = query[:-1] + " FROM %s" % info.Table
+        if not info.Conditions == "":
+            query += " WHERE %s;" % info.Conditions
+        else:
+            query += ";"
+        IF_Print(query)
+        try:
+            cursor = self.__db.cursor().execute(query)
+            return cursor
+        except:
+            print("cannot do query %s" % query)
+            return None
