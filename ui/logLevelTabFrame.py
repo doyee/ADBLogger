@@ -188,3 +188,6 @@ class LogLevelTabFrame(TabFrame):
         self.pushButton_apply.setText(QCoreApplication.translate("TabFrame", u"\u5e94\u7528", None))
     # retranslateUi
 
+    def updateUI(self):
+        pass
+

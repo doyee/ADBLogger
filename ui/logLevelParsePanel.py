@@ -22,6 +22,7 @@ class LogLevelParsePanel(SettingDialog):
 
     def __init__(self, parent, size, module):
         super().__init__(parent, size)
+        self.__parent = parent
         self.setWindowFlags(Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.Dialog)
         self.__module = module
 

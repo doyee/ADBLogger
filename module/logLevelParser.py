@@ -1,11 +1,12 @@
 from utils.defines import *
 from utils.Utils import *
-from module.sqlManager import  *
+from module.sqlManager import *
 from module.table import *
 
 class LogLevelParser(object):
     def __init__(self):
         self.__mask = {}
+        self.__sqlManager = SQLManager.get_instance()
         pass
 
     def Parse(self, str):
@@ -51,9 +52,9 @@ class LogLevelParser(object):
 
         IF_Print(self.__mask)
         # 4. store the result into db
-        sql = SQLManager.get_instance()
-        sql.DeleteTable(maskTable())
-        sql.CreateTable(maskTable())
+        t = maskTable()
+        self.__sqlManager.DeleteTable(t)
+        self.__sqlManager.CreateTable(t)
         if len(definitions) == 0:
             return ERROR_CODE_INVALID_PARAM
 
@@ -65,7 +66,7 @@ class LogLevelParser(object):
             insertInfo.Values = [idx, define, self.__mask[define]]
             insertInfo.isChar = [False, True, False]
             idx += 1
-            if sql.Insert(insertInfo) == ERROR_CODE_DB_INSERT_FAILED:
+            if self.__sqlManager.Insert(insertInfo) == ERROR_CODE_DB_INSERT_FAILED:
                 return ERROR_CODE_DB_INSERT_FAILED
         return ERROR_CODE_SUCCESS
 
