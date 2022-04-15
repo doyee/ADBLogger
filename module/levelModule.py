@@ -14,7 +14,7 @@ class LevelModule(ToolModule):
 
     def Update(self):
         self.__camxLogMasks = self.__getMaskFromDb()
-        print(self.__camxLogMasks)
+        self.__selection = {}
         pass
 
     def SelectGroup(self, group):

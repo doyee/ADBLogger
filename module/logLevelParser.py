@@ -2,7 +2,6 @@ from utils.defines import *
 from utils.Utils import *
 from module.sqlManager import *
 from module.table import *
-from controller.logLevelParserListener import LogLevelParserListener
 
 class LogLevelParser(object):
     def __init__(self, listener):
