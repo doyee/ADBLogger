@@ -56,7 +56,6 @@ class LogLevelParsePanel(SettingDialog):
 
         res = self.__module.Parse(text)
         self.__ShowMessage(res)
-        self.__parent
 
     def __ShowMessage(self, errorCode):
         if errorCode == ERROR_CODE_SUCCESS:

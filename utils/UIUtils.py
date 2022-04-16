@@ -30,6 +30,10 @@ def ShowMessageDialog(msgType):
         messageBox = QMessageBox(QMessageBox.Warning, "警告", "写入数据库失败。")
         messageBox.addButton(u"关闭", QMessageBox.YesRole)
         messageBox.exec_()
+    elif msgType == MESSAGE_TYPE_SEARCH_FAILED:
+        messageBox = QMessageBox(QMessageBox.Warning, "警告", "没有找到匹配的项目。")
+        messageBox.addButton(u"关闭", QMessageBox.YesRole)
+        messageBox.exec_()
 
 def FillupListView(parent, listView, data):
     model = QStandardItemModel(parent)

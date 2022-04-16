@@ -3,12 +3,13 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from controller.logLevelParserListener import LogLevelParserListener
+from module.levelModule import LogMaskSelectionListener
 from ui.tabFrame import TabFrame
 from utils.Utils import *
 from utils.UIUtils import *
 
 
-class LogLevelTabFrame(TabFrame, LogLevelParserListener):
+class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListener):
 
     def __init__(self, module, parent=None):
         super().__init__(module, parent)
@@ -71,12 +72,14 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener):
         self.horizontalLayout_search = QHBoxLayout()
         self.horizontalLayout_search.setObjectName(u"horizontalLayout_search")
         self.lineEdit_mask_search = QLineEdit(self)
+        self.lineEdit_mask_search.setEnabled(False)
         self.lineEdit_mask_search.setObjectName(u"lineEdit_mask_search")
         self.lineEdit_mask_search.setAlignment(Qt.AlignCenter)
 
         self.horizontalLayout_search.addWidget(self.lineEdit_mask_search)
 
         self.pushButton_mask_search = QPushButton(self)
+        self.pushButton_mask_search.setEnabled(False)
         self.pushButton_mask_search.setObjectName(u"pushButton_mask_search")
 
         self.horizontalLayout_search.addWidget(self.pushButton_mask_search)
@@ -159,6 +162,7 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener):
 
         self.verticalLayout_main.addLayout(self.horizontalLayout_buttons)
 
+        self._module.SetListener(self)
         self._module.Update()
         super().layout()
 
@@ -190,14 +194,12 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener):
     # retranslateUi
 
     def _connectUi(self):
+        self.pushButton_mask_search.clicked.connect(self.__onSearch)
         self.listView_group.clicked.connect(self.__onListClicked)
         self.listView_group.doubleClicked.connect(self.__onListDoubleClicked)
 
         self.listView_mask.clicked.connect(self.__onListClicked)
         self.listView_mask.doubleClicked.connect(self.__onListDoubleClicked)
-
-    def updateUI(self):
-        pass
 
     def __fillMaskList(self):
         FillupListView(self, self.listView_group, self._module.GetGroups())
@@ -244,9 +246,28 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener):
             selected = self._module.GetSelected()
             FillupListView(self, self.listView_preview, selected)
 
+    def __onSearch(self):
+        if self.lineEdit_mask_search.text() == "":
+            ShowMessageDialog(MESSAGE_TYPE_INVALID_PARAM)
+        else:
+            idx = self._module.SearchMask(self.listView_group.currentIndex().data(), self.lineEdit_mask_search.text())
+            if idx == -1:
+                ShowMessageDialog(MESSAGE_TYPE_SEARCH_FAILED)
+                return
+            else:
+                i = self.listView_mask.model().item(idx, 0).index()
+                print(i)
+                self.listView_mask.setCurrentIndex(i)
+
+
     def onParseSuccess(self):
         self._module.Update()
         self.listView_mask.setModel(None)
         self.listView_group.setModel(None)
         self.listView_preview.setModel(None)
         self.__fillMaskList()
+
+    def onLogGroupSelectionChanged(self, isEmpty):
+        self.pushButton_mask_search.setEnabled(not isEmpty)
+        self.lineEdit_mask_search.setText("")
+        self.lineEdit_mask_search.setEnabled(not isEmpty)
