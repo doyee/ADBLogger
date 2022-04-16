@@ -209,6 +209,8 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener):
             masks = self._module.GetMasksForGroup(group)
             alreadyHas = not self._module.SelectGroup(group)
             if alreadyHas:
+                selectedMasks = self._module.GetSelectedMaskForGroup(group)
+                FillupListViewWithHighlight(self, self.listView_mask, masks, selectedMasks, LIST_SELECTED_COLOR)
                 return
             if masks is not None:
                 FillupListView(self, self.listView_mask, masks)

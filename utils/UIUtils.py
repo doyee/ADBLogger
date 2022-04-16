@@ -39,9 +39,21 @@ def FillupListView(parent, listView, data):
         model.appendRow(itm)
     listView.setModel(model)
 
+def FillupListViewWithHighlight(parent, listview, data, highlightIndex, color):
+    model = QStandardItemModel(parent)
+    for d in data:
+        itm = QStandardItem(d)
+        itm.setEditable(False)
+        if d in highlightIndex:
+            itm.setBackground(color)
+        model.appendRow(itm)
+    listview.setModel(model)
+
 def PaintListViewSelectionBackground(listview, color):
     model = listview.model()
     index = listview.currentIndex()
 
     item = model.itemFromIndex(index)
     item.setBackground(color)
+
+

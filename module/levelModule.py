@@ -51,6 +51,9 @@ class LevelModule(ToolModule):
         else:
             return self.__camxLogMasks[0]
 
+    def GetSelectedMaskForGroup(self, group):
+        return self.__selection[group]
+
     def GetSelected(self):
         selected = []
         for group in LOG_GROUPS:
