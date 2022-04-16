@@ -8,6 +8,7 @@ from ui.tabFrame import TabFrame
 from utils.Utils import *
 from utils.UIUtils import *
 
+CURRENT_GROUP_PREFIX = u"当前选择的Group:"
 
 class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListener):
 
@@ -40,6 +41,12 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
         self.horizontalLayout_group_heading.addWidget(self.pushButton_group_select_all)
 
         self.verticalLayout_group.addLayout(self.horizontalLayout_group_heading)
+
+        self.label_current_group = QLabel(self)
+        self.label_current_group.setObjectName(u"label_current_group")
+        self.label_current_group.setContentsMargins(0, 5, 0, 5)
+
+        self.verticalLayout_group.addWidget(self.label_current_group)
 
         self.listView_group = QListView(self)
         self.listView_group.setObjectName(u"listView_group")
@@ -172,6 +179,7 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
     def _retranslateUi(self):
         self.label_group.setText(QCoreApplication.translate("TabFrame", u"Group", None))
+        self.label_current_group.setText(QCoreApplication.translate("TabFrame", CURRENT_GROUP_PREFIX, None))
         self.pushButton_group_reset.setText(QCoreApplication.translate("TabFrame", u"\u91cd\u7f6e", None))
         self.pushButton_group_select_all.setText(QCoreApplication.translate("TabFrame", u"\u5168\u9009", None))
         self.label_mask.setText(QCoreApplication.translate("TabFrame", u"Mask", None))
@@ -268,6 +276,10 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
         self.__fillMaskList()
 
     def onLogGroupSelectionChanged(self, isEmpty):
+        if not isEmpty:
+            self.label_current_group.setText("%s %s"% (CURRENT_GROUP_PREFIX, self.listView_group.currentIndex().data()))
+        else:
+            self.label_current_group.setText(CURRENT_GROUP_PREFIX)
         self.pushButton_mask_search.setEnabled(not isEmpty)
         self.lineEdit_mask_search.setText("")
         self.lineEdit_mask_search.setEnabled(not isEmpty)
