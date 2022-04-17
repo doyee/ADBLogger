@@ -83,6 +83,10 @@ class LevelModule(ToolModule):
                 pass
         return selected
 
+    def GetSelectedGroup(self, text):
+        group = text[:text.find("=")]
+        return LOG_GROUPS.index(group)
+
     def SearchMask(self, group, mask):
         if group == LOG_GROUPS[0]:
             try:

@@ -209,13 +209,15 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
         self.listView_mask.clicked.connect(self.__onListClicked)
         self.listView_mask.doubleClicked.connect(self.__onListDoubleClicked)
 
+        self.listView_preview.clicked.connect(self.__onListClicked)
+
     def __fillMaskList(self):
         FillupListView(self, self.listView_group, self._module.GetGroups())
 
-    def __onListClicked(self):
-        PaintListViewSelectionBackground(self.sender(), LIST_SELECTED_COLOR)
+    def __onListClicked(self, index):
         if self.sender() == self.listView_group:
-            group = self.listView_group.currentIndex().data()
+            PaintListViewSelectionBackground(self.sender(), LIST_SELECTED_COLOR)
+            group = index.data()
             masks = self._module.GetMasksForGroup(group)
             alreadyHas = not self._module.SelectGroup(group)
             if alreadyHas:
@@ -230,16 +232,23 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
                 FillupListView(self, self.listView_preview, selected)
 
         elif self.sender() == self.listView_mask:
+            PaintListViewSelectionBackground(self.sender(), LIST_SELECTED_COLOR)
             group = self.listView_group.currentIndex().data()
-            mask = self.listView_mask.currentIndex().data()
+            mask = index.data()
             self._module.SelectMask(group, mask)
             selected = self._module.GetSelected()
             FillupListView(self, self.listView_preview, selected)
+        elif self.sender() == self.listView_preview:
+            idx = self._module.GetSelectedGroup(self.listView_preview.currentIndex().data())
+            i = self.listView_group.model().index(idx, 0)
+            self.listView_group.clicked.emit(i)
+            self.listView_group.setCurrentIndex(i)
 
-    def __onListDoubleClicked(self):
+
+    def __onListDoubleClicked(self, index):
         PaintListViewSelectionBackground(self.sender(), LIST_NORMAL_COLOR)
         if self.sender() == self.listView_group:
-            group = self.listView_group.currentIndex().data()
+            group = index.data()
             self._module.DropGroup(group)
             selected = self._module.GetSelected()
             if len(selected) > 0:
@@ -249,7 +258,7 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
             self.listView_mask.setModel(None)
         elif self.sender() == self.listView_mask:
             group = self.listView_group.currentIndex().data()
-            mask = self.listView_mask.currentIndex().data()
+            mask = index.data()
             self._module.DropMask(group, mask)
             selected = self._module.GetSelected()
             FillupListView(self, self.listView_preview, selected)
