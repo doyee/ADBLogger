@@ -51,7 +51,7 @@ class LogLevelParsePanel(SettingDialog):
     def _apply(self):
         text = self.__plainTextEdit_parser.toPlainText()
         if text == "":
-            ShowMessageDialog(MESSAGE_TYPE_PARSER_EMPTY_INPUT)
+            ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_PARSER_EMPTY_INPUT)
             return
 
         res = self.__module.Parse(text)
@@ -59,8 +59,8 @@ class LogLevelParsePanel(SettingDialog):
 
     def __ShowMessage(self, errorCode):
         if errorCode == ERROR_CODE_SUCCESS:
-            ShowMessageDialog(MESSAGE_TYPE_SUCCESS)
+            ShowMessageDialog(MESSAGE_TYPE_INFO, MESSAGE_STR_SUCCESS)
         elif errorCode == ERROR_CODE_INVALID_PARAM:
-            ShowMessageDialog(MESSAGE_TYPE_INVALID_PARAM)
+            ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_INVALID_PARAM)
         elif errorCode == ERROR_CODE_DB_INSERT_FAILED:
-            ShowMessageDialog(MESSAGE_TYPE_DB_INSERT_FAILED)
+            ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_DB_INSERT_FAILED)

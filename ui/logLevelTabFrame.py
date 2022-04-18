@@ -208,7 +208,7 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
             if masks is not None:
                 FillupListView(self, self.listView_mask, masks)
             else:
-                ShowMessageDialog(MESSAGE_TYPE_NO_MASK)
+                ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_NO_MASK)
                 return
             alreadyHas = not self._module.SelectGroup(group)
             if alreadyHas:
@@ -254,11 +254,11 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
     def __onSearch(self):
         if self.lineEdit_mask_search.text() == "":
-            ShowMessageDialog(MESSAGE_TYPE_INVALID_PARAM)
+            ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_INVALID_PARAM)
         else:
             idx = self._module.SearchMask(self.listView_group.currentIndex().data(), self.lineEdit_mask_search.text())
             if idx == -1:
-                ShowMessageDialog(MESSAGE_TYPE_SEARCH_FAILED)
+                ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_SEARCH_FAILED)
                 return
             else:
                 i = self.listView_mask.model().item(idx, 0).index()

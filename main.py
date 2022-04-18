@@ -16,7 +16,7 @@ def launchCheck():
     # 1. check adb
     hasAdb = ADBManager.get_instance().CheckADB()
     if not hasAdb:
-        ShowMessageDialog(MESSAGE_TYPE_ADB_ERROR_QUIT)
+        ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_ADB_ERROR_QUIT)
         exit(0)
 
     # 2. check cache dir
