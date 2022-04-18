@@ -67,7 +67,10 @@ class LevelModule(ToolModule):
         self.__selection[group].append(mask)
 
     def DropMask(self, group, mask):
-        self.__selection[group].remove(mask)
+        try:
+            self.__selection[group].remove(mask)
+        except:
+            pass
         if self.__selection[group] == None:
             self.__selection[group] = []
 

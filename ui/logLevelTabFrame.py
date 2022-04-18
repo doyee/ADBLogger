@@ -66,11 +66,13 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
         self.pushButton_mask_reset = QPushButton(self)
         self.pushButton_mask_reset.setObjectName(u"pushButton_mask_reset")
+        self.pushButton_mask_reset.setEnabled(False)
 
         self.horizontalLayout_mask_heading.addWidget(self.pushButton_mask_reset)
 
         self.pushButton_mask_select_all = QPushButton(self)
         self.pushButton_mask_select_all.setObjectName(u"pushButton_mask_select_all")
+        self.pushButton_mask_select_all.setEnabled(False)
 
         self.horizontalLayout_mask_heading.addWidget(self.pushButton_mask_select_all)
 
@@ -190,6 +192,10 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
     def _connectUi(self):
         self.pushButton_mask_search.clicked.connect(self.__onSearch)
+        self.pushButton_group_select_all.clicked.connect(self.__onClearAndResetButtonClicked)
+        self.pushButton_group_reset.clicked.connect(self.__onClearAndResetButtonClicked)
+        self.pushButton_mask_select_all.clicked.connect(self.__onClearAndResetButtonClicked)
+        self.pushButton_mask_reset.clicked.connect(self.__onClearAndResetButtonClicked)
         self.listView_group.clicked.connect(self.__onListClicked)
         self.listView_group.doubleClicked.connect(self.__onListDoubleClicked)
 
@@ -215,13 +221,13 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
                 selectedMasks = self._module.GetSelectedMaskForGroup(group)
                 FillupListViewWithHighlight(self, self.listView_mask, masks, selectedMasks, LIST_SELECTED_COLOR)
                 return
-            PaintListViewSelectionBackground(self.sender(), LIST_SELECTED_COLOR)
+            PaintListViewSelectionBackground(self.listView_group.model(), index, LIST_SELECTED_COLOR)
             selected = self._module.GetSelected()
             if len(selected) > 0:
                 FillupListView(self, self.listView_preview, selected)
 
         elif self.sender() == self.listView_mask:
-            PaintListViewSelectionBackground(self.sender(), LIST_SELECTED_COLOR)
+            PaintListViewSelectionBackground(self.listView_mask.model(), index, LIST_SELECTED_COLOR)
             group = self.listView_group.currentIndex().data()
             mask = index.data()
             self._module.SelectMask(group, mask)
@@ -235,7 +241,7 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
 
     def __onListDoubleClicked(self, index):
-        PaintListViewSelectionBackground(self.sender(), LIST_NORMAL_COLOR)
+        PaintListViewSelectionBackground(self.sender().model(), index, LIST_NORMAL_COLOR)
         if self.sender() == self.listView_group:
             group = index.data()
             self._module.DropGroup(group)
@@ -262,11 +268,26 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
                 return
             else:
                 i = self.listView_mask.model().item(idx, 0).index()
-                print(i)
                 self.listView_mask.setCurrentIndex(i)
 
     def __onCheckBoxChecked(self, isChecked):
         self._module.UpdateEnableLogMask(self.sender().accessibleName(), isChecked)
+
+    def __onClearAndResetButtonClicked(self):
+        if self.sender() == self.pushButton_group_select_all:
+            ListViewClickAllItem(self.listView_group)
+        elif self.sender() == self.pushButton_group_reset:
+            if len(self._module.GetSelected()) == 0:
+                return
+            ListViewDoubleClickedAllItem(self.listView_group)
+            self.listView_group.setCurrentIndex(self.listView_group.model().index(-1, 0))
+        elif self.sender() == self.pushButton_mask_select_all:
+            ListViewClickAllItem(self.listView_mask)
+        elif self.sender() == self.pushButton_mask_reset:
+            if len(self._module.GetSelectedMaskForGroup(self.listView_group.currentIndex().data())) == 0:
+                return
+            ListViewDoubleClickedAllItem(self.listView_mask)
+            self.listView_mask.setCurrentIndex(self.listView_mask.model().index(-1, 0))
 
     def onParseSuccess(self):
         self._module.Update()
@@ -283,3 +304,5 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
         self.pushButton_mask_search.setEnabled(not isEmpty)
         self.lineEdit_mask_search.setText("")
         self.lineEdit_mask_search.setEnabled(not isEmpty)
+        self.pushButton_mask_select_all.setEnabled(not isEmpty)
+        self.pushButton_mask_reset.setEnabled(not isEmpty)

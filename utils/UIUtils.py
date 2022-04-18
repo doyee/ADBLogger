@@ -36,11 +36,25 @@ def FillupListViewWithHighlight(parent, listview, data, highlightIndex, color):
         model.appendRow(itm)
     listview.setModel(model)
 
-def PaintListViewSelectionBackground(listview, color):
-    model = listview.model()
-    index = listview.currentIndex()
-
+def PaintListViewSelectionBackground(model, index, color):
     item = model.itemFromIndex(index)
     item.setBackground(color)
+
+def ListViewClickAllItem(listView):
+    model = listView.model()
+    rows = model.rowCount()
+    for i in range(rows):
+        index = model.index(i, 0)
+        listView.clicked.emit(index)
+        listView.setCurrentIndex(index)
+
+def ListViewDoubleClickedAllItem(listView):
+    model = listView.model()
+    rows = model.rowCount()
+    for i in range(rows):
+        index = model.index(i, 0)
+        listView.doubleClicked.emit(index)
+        listView.setCurrentIndex(index)
+
 
 
