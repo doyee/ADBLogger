@@ -104,25 +104,17 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
         self.horizontalLayout_check = QHBoxLayout()
         self.horizontalLayout_check.setObjectName(u"horizontalLayout_check")
-        self.checkBox_systemlog = QCheckBox(self)
-        self.checkBox_systemlog.setObjectName(u"checkBox_systemlog")
 
-        self.horizontalLayout_check.addWidget(self.checkBox_systemlog)
-
-        self.checkBox_offlinelog = QCheckBox(self)
-        self.checkBox_offlinelog.setObjectName(u"checkBox_offlinelog")
-
-        self.horizontalLayout_check.addWidget(self.checkBox_offlinelog)
-
-        self.checkBox_drq = QCheckBox(self)
-        self.checkBox_drq.setObjectName(u"checkBox_drq")
-
-        self.horizontalLayout_check.addWidget(self.checkBox_drq)
-
-        self.checkBox_metadata = QCheckBox(self)
-        self.checkBox_metadata.setObjectName(u"checkBox_metadata")
-
-        self.horizontalLayout_check.addWidget(self.checkBox_metadata)
+        enableLogMask = self._module.GetEnableLogMasks()
+        for i in range(len(enableLogMask)):
+            checkbox = QCheckBox(self)
+            des = enableLogMask[i][0]
+            checkbox.setObjectName("checkbox_%s" % des)
+            checkbox.setAccessibleName(des)
+            checkbox.setText(des)
+            checkbox.setChecked(enableLogMask[i][1])
+            checkbox.clicked.connect(self.__onCheckBoxChecked)
+            self.horizontalLayout_check.addWidget(checkbox)
 
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
@@ -188,11 +180,6 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
         self.lineEdit_mask_search.setPlaceholderText(
             QCoreApplication.translate("TabFrame", u"\u8bf7\u8f93\u5165\u5b8c\u6574mask", None))
         self.pushButton_mask_search.setText(QCoreApplication.translate("TabFrame", u"\u641c\u7d22", None))
-        self.checkBox_systemlog.setText(QCoreApplication.translate("TabFrame", u"System Log", None))
-        self.checkBox_offlinelog.setText(QCoreApplication.translate("TabFrame", u"Offline Log", None))
-        self.checkBox_drq.setText(QCoreApplication.translate("TabFrame", u"DRQ Log", None))
-        self.checkBox_metadata.setText(QCoreApplication.translate("TabFrame", u"Metadata Log", None))
-        self.label_preview.setText(QCoreApplication.translate("TabFrame", u"\u9884\u89c8", None))
         self.pushButton_reset.setText(
             QCoreApplication.translate("TabFrame", u"\u8bfb\u53d6\u8bbe\u5907\u9884\u8bbe", None))
         self.pushButton_clear.setText(
@@ -278,6 +265,8 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
                 print(i)
                 self.listView_mask.setCurrentIndex(i)
 
+    def __onCheckBoxChecked(self, isChecked):
+        self._module.UpdateEnableLogMask(self.sender().accessibleName(), isChecked)
 
     def onParseSuccess(self):
         self._module.Update()

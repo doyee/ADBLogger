@@ -34,7 +34,7 @@ def ShowMessageDialog(msgType):
         messageBox.addButton(u"关闭", QMessageBox.YesRole)
         messageBox.exec_()
     elif msgType == MESSAGE_TYPE_NO_MASK:
-        messageBox = QMessageBox(QMessageBox.Warning, "警告", "没有找到对应的Mask值。请重新解析后再尝试。")
+        messageBox = QMessageBox(QMessageBox.Warning, "警告", "没有找到对应的Mask值。请重新解析后再尝试。\n设置->解析log等级设置")
         messageBox.addButton(u"关闭", QMessageBox.YesRole)
         messageBox.exec_()
 
