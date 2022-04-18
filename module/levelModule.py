@@ -68,6 +68,8 @@ class LevelModule(ToolModule):
         if group == LOG_GROUPS[0]:
             return OVERRIDE_LOG_MASK
         else:
+            if self.__camxLogMasks is None:
+                return None
             return self.__camxLogMasks[0]
 
     def GetSelectedMaskForGroup(self, group):

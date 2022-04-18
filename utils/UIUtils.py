@@ -33,6 +33,10 @@ def ShowMessageDialog(msgType):
         messageBox = QMessageBox(QMessageBox.Warning, "警告", "没有找到匹配的项目。")
         messageBox.addButton(u"关闭", QMessageBox.YesRole)
         messageBox.exec_()
+    elif msgType == MESSAGE_TYPE_NO_MASK:
+        messageBox = QMessageBox(QMessageBox.Warning, "警告", "没有找到对应的Mask值。请重新解析后再尝试。")
+        messageBox.addButton(u"关闭", QMessageBox.YesRole)
+        messageBox.exec_()
 
 def FillupListView(parent, listView, data):
     model = QStandardItemModel(parent)

@@ -216,17 +216,19 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
     def __onListClicked(self, index):
         if self.sender() == self.listView_group:
-            PaintListViewSelectionBackground(self.sender(), LIST_SELECTED_COLOR)
             group = index.data()
             masks = self._module.GetMasksForGroup(group)
+            if masks is not None:
+                FillupListView(self, self.listView_mask, masks)
+            else:
+                ShowMessageDialog(MESSAGE_TYPE_NO_MASK)
+                return
             alreadyHas = not self._module.SelectGroup(group)
             if alreadyHas:
                 selectedMasks = self._module.GetSelectedMaskForGroup(group)
                 FillupListViewWithHighlight(self, self.listView_mask, masks, selectedMasks, LIST_SELECTED_COLOR)
                 return
-            if masks is not None:
-                FillupListView(self, self.listView_mask, masks)
-
+            PaintListViewSelectionBackground(self.sender(), LIST_SELECTED_COLOR)
             selected = self._module.GetSelected()
             if len(selected) > 0:
                 FillupListView(self, self.listView_preview, selected)
