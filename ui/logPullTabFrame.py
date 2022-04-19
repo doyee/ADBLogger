@@ -11,7 +11,7 @@ class LogPullTabFrame(TabFrame):
         super().__init__(module, parent)
         self.__workingType = 1 << WORKING_TYPE_PULL_AND_MERGE
 
-    def layout(self):
+    def layoutFrame(self):
         self.verticalLayout = QVBoxLayout(self)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(20, 10, 20, 10)
@@ -135,7 +135,7 @@ class LogPullTabFrame(TabFrame):
         self.verticalLayout.addLayout(self.horizontalLayout_run)
 
 
-        super().layout()
+        super().layoutFrame()
         self.__updateUIForWorkingType()
 
         QMetaObject.connectSlotsByName(self)

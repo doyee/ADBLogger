@@ -10,7 +10,7 @@ class TabFrame(QFrame):
         self._module = module
 
     @abstractmethod
-    def layout(self):
+    def layoutFrame(self):
         self._connectUi()
         self._retranslateUi()
 

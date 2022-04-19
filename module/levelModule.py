@@ -2,9 +2,12 @@ from module.sqlManager import SQLManager
 from module.toolModule import ToolModule
 from module.table import *
 
+from utils.defines import *
+from utils.Utils import *
+
 LOG_GROUPS = ["overrideLogLevels", "CamxLogDebug", "CamxLogError", "CamxLogWarning", "CamxLogConfig", "CamxLogInfo", "CamxLogVerbose", "CamxLogCoreCfg"]
 OVERRIDE_LOG_MASK = ["Error", "Warning", "Config", "Info", "Dump", "Verbose", "Log", "Core Config"]
-LOG_MASK_ENABLE = [("System Log", True), ("Offline Log", False), ("DRQ Log", False), ("Metadata Log", False)]
+LOG_MASK_ENABLE = [("System Log", True, "systemLogEnable"), ("Offline Log", False, "EnableAsciiLogging"), ("DRQ Log", False, "logDRQEnable"), ("Metadata Log", False, "logMetaEnable")]
 
 class LogMaskSelectionListener(object):
     @abstractmethod
@@ -113,6 +116,47 @@ class LevelModule(ToolModule):
                 return self.__camxLogMasks[0].index(mask)
             except:
                 return -1
+
+    def DropSettingsFromFile(self):
+        # first pull out camxoverridesettings.txt
+        savingPath = JoinPath(GetAppDataDir(), CAMX_OVERRIDE_SETTINGS)
+        res = self._adb_manager.Pull(CAMX_OVERRIDE_SETTINGS_PATH, savingPath)
+        if not res == ERROR_CODE_SUCCESS:
+            return res
+        f = open(savingPath, "r+")
+        toWrite = self.__parseLogSettingsFile(f.readlines(), True)
+        f.close()
+        f = open(savingPath, "w+")
+        f.writelines(toWrite)
+        f.close()
+        res = self._adb_manager.Push(savingPath, CAMX_OVERRIDE_SETTINGS_ROOT[:-1])
+        return res
+
+    def __parseLogSettingsFile(self, lines, isExclude):
+        toReturn = []
+        for line in lines:
+            flag = True
+            for logMask in LOG_GROUPS:
+                keyWord = logMask + "="
+                if line.count(keyWord) > 0:
+                    flag = False
+                    break
+            if not flag:
+                if not isExclude:
+                    toReturn.append(line)
+                continue
+            for des, value, logMask in LOG_MASK_ENABLE:
+                keyWord = logMask + "="
+                if line.count(keyWord) > 0:
+                    flag = False
+                    break
+            if not flag:
+                if not isExclude:
+                    toReturn.append(line)
+                continue
+            elif isExclude:
+                toReturn.append(line)
+        return toReturn
 
 
     def __getMaskFromDb(self):

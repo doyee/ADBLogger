@@ -150,9 +150,9 @@ class MainWindow(QMainWindow):
         levelTabGeo = self.tab_log_level.geometry()
         statusBarSize = self.statusbar.size()
         self.level_tab_frame.setGeometry(QRect(0, 0, levelTabGeo.width(), levelTabGeo.height() - statusBarSize.height() - 10))
-        self.level_tab_frame.layout()
+        self.level_tab_frame.layoutFrame()
         self.log_pull_frame.setGeometry(QRect(0, 0, levelTabGeo.width(), levelTabGeo.height() - statusBarSize.height() - 10))
-        self.log_pull_frame.layout()
+        self.log_pull_frame.layoutFrame()
         if isFirstTime:
             self.__parserDialog.show()
 
@@ -162,7 +162,7 @@ class MainWindow(QMainWindow):
         self.action_log_level_settings.setText(QCoreApplication.translate("MainWindow", u"\u89e3\u6790log\u7b49\u7ea7\u8bbe\u7f6e", None))
         self.action_refresh_device_list.setText(QCoreApplication.translate("MainWindow", u"\u5237\u65b0\u8bbe\u5907\u5217\u8868", None))
         self.label_device.setText(QCoreApplication.translate("MainWindow", u"\u8bbe\u5907\u5217\u8868", None))
-        self.pushButton_root.setText(QCoreApplication.translate("MainWindow", u"root & remount", None))
+        self.pushButton_root.setText(QCoreApplication.translate("MainWindow", u"root && remount", None))
         self.pushButton_kill_cam.setText(QCoreApplication.translate("MainWindow", u"kill Camera server", None))
         self.tabWidget_main.setTabText(self.tabWidget_main.indexOf(self.tab_log_level), QCoreApplication.translate("MainWindow", u"log\u7b49\u7ea7\u8bbe\u7f6e", None))
         self.tabWidget_main.setTabText(self.tabWidget_main.indexOf(self.tab_log_pull), QCoreApplication.translate("MainWindow", u"log\u62c9\u53d6", None))

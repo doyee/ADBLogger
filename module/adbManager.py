@@ -39,6 +39,36 @@ class ADBManager(object):
     def SetSelectedDevice(self, index):
         self.__selectedDevice = index
 
+    def Pull(self, src, dest):
+        if self.__selectedDevice == -1:
+            return ERROR_CODE_NO_DEVICE
+        cmd = "%s -s %s pull %s %s" % (self.__adbPath, self.GetSelectedDeviceId(), src, dest)
+        IF_Print("cmd: %s" % cmd)
+        result = RunCmdAndReturn(cmd)
+        IF_Print(result)
+        if result.count("not exist") > 0:
+            return ERROR_CODE_ADB_PULL_NOT_EXIST
+        elif result.count("adb: error:") > 0:
+            return ERROR_CODE_ADB_PULL_FAILED
+        return ERROR_CODE_SUCCESS
+
+    def Push(self, src, dest):
+        if self.__selectedDevice == -1:
+            return ERROR_CODE_NO_DEVICE
+        cmd = "%s -s %s push %s %s" % (self.__adbPath, self.GetSelectedDeviceId(), src, dest)
+        IF_Print("cmd: %s" % cmd)
+        result = RunCmdAndReturn(cmd)
+        IF_Print(result)
+        if result.count("adb: error:") > 0:
+            return ERROR_CODE_ADB_PUSH_FAILED
+        return ERROR_CODE_SUCCESS
+
+    def GetSelectedDeviceId(self):
+        if self.__selectedDevice == -1:
+            return None
+        else:
+            return self.__deviceInfo[self.__selectedDevice][DEVICE_INFO_ID]
+
     def __adbDevices(self):
         cmd = "%s devices" % self.__adbPath
         IF_Print("cmd: %s" % cmd)

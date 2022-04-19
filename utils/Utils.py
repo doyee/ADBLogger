@@ -39,3 +39,6 @@ def Mkdir(path):
         print("mkdir failed")
         return False
     return True
+
+def JoinPath(parent, child):
+    return os.path.join(parent, child)

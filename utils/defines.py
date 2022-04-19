@@ -1,11 +1,16 @@
 from PyQt5.QtGui import QColor
 
+DEBUG = True
 DEBUG_PRINT = True
 
 # ERROR CODE
 ERROR_CODE_BASE = 0
 ERROR_CODE_SUCCESS = ERROR_CODE_BASE
 ERROR_CODE_INVALID_PARAM = 1
+ERROR_CODE_NO_DEVICE = 2
+ERROR_CODE_ADB_PULL_FAILED = 3
+ERROR_CODE_ADB_PULL_NOT_EXIST = 4
+ERROR_CODE_ADB_PUSH_FAILED = 5
 
 ERROR_CODE_DB_INSERT_FAILED = 10
 
@@ -20,6 +25,9 @@ MESSAGE_STR_INVALID_PARAM = "无效的输入。请检查后重新输入。"
 MESSAGE_STR_DB_INSERT_FAILED = "写入数据库失败。"
 MESSAGE_STR_SEARCH_FAILED = "没有找到匹配的项目。"
 MESSAGE_STR_NO_MASK = "没有找到对应的Mask值。请重新解析后再尝试。\n设置->解析log等级设置"
+MESSAGE_STR_NO_DEVICE = "没有找到已连接的设备。请先连接设备，再做尝试。"
+MESSAGE_STR_ADB_PULL_FAILED = "从设备中拉去失败。请检查：\n    1.设备是否连接\n    2.设备连接状态\n    3.设备是否ROOT\n    4.设备内是否存在对应文件"
+MESSAGE_STR_ADB_PUSH_FAILED = "向设备中Push文件失败。请检查：\n    1.设备是否连接\n    2.设备连接状态\n    3.设备是否ROOT\n    4.设备内是否存在对应路径"
 
 WORKING_TYPE_PULL_AND_MERGE = 0
 WORKING_TYPE_MERGE = 1
@@ -34,6 +42,16 @@ DB_VERSION = 1
 DEVICE_INFO_ID = "deviceId"
 DEVICE_INFO_NAME = "deviceName"
 DEVICE_INFO_STATUS = "deviceStatus"
+
+
+
+if not DEBUG:
+    CAMX_OVERRIDE_SETTINGS_ROOT = "/vendor/etc/camera/"
+    CAMX_OVERRIDE_SETTINGS = "camxoverridesettings.txt"
+else:
+    CAMX_OVERRIDE_SETTINGS_ROOT = "/storage/emulated/0/test/"
+    CAMX_OVERRIDE_SETTINGS = "test.txt"
+CAMX_OVERRIDE_SETTINGS_PATH = CAMX_OVERRIDE_SETTINGS_ROOT + CAMX_OVERRIDE_SETTINGS
 
 TOOLS_ROOT_DIR = "adbTools"
 TOOLS_DB_MANE = "adbTools.db"

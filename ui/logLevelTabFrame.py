@@ -15,7 +15,7 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
     def __init__(self, module, parent=None):
         super().__init__(module, parent)
 
-    def layout(self):
+    def layoutFrame(self):
         self.verticalLayout_main = QVBoxLayout(self)
         self.verticalLayout_main.setObjectName(u"verticalLayout_main")
         self.verticalLayout_main.setContentsMargins(10, 10, 10, 10)
@@ -142,10 +142,10 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
         self.horizontalLayout_buttons = QHBoxLayout()
         self.horizontalLayout_buttons.setObjectName(u"horizontalLayout_buttons")
-        self.pushButton_reset = QPushButton(self)
-        self.pushButton_reset.setObjectName(u"pushButton_reset")
+        self.pushButton_load = QPushButton(self)
+        self.pushButton_load.setObjectName(u"pushButton_reset")
 
-        self.horizontalLayout_buttons.addWidget(self.pushButton_reset)
+        self.horizontalLayout_buttons.addWidget(self.pushButton_load)
 
         self.pushButton_clear = QPushButton(self)
         self.pushButton_clear.setObjectName(u"pushButton_clear")
@@ -165,7 +165,7 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
         self._module.SetListener(self)
         self._module.Update()
-        super().layout()
+        super().layoutFrame()
 
         QMetaObject.connectSlotsByName(self)
 
@@ -182,7 +182,7 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
         self.lineEdit_mask_search.setPlaceholderText(
             QCoreApplication.translate("TabFrame", u"\u8bf7\u8f93\u5165\u5b8c\u6574mask", None))
         self.pushButton_mask_search.setText(QCoreApplication.translate("TabFrame", u"\u641c\u7d22", None))
-        self.pushButton_reset.setText(
+        self.pushButton_load.setText(
             QCoreApplication.translate("TabFrame", u"\u8bfb\u53d6\u8bbe\u5907\u9884\u8bbe", None))
         self.pushButton_clear.setText(
             QCoreApplication.translate("TabFrame", u"\u6e05\u9664\u8bbe\u5907\u9884\u8bbe", None))
@@ -196,6 +196,9 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
         self.pushButton_group_reset.clicked.connect(self.__onClearAndResetButtonClicked)
         self.pushButton_mask_select_all.clicked.connect(self.__onClearAndResetButtonClicked)
         self.pushButton_mask_reset.clicked.connect(self.__onClearAndResetButtonClicked)
+
+        self.pushButton_clear.clicked.connect(self.__onDeviceControl)
+
         self.listView_group.clicked.connect(self.__onListClicked)
         self.listView_group.doubleClicked.connect(self.__onListDoubleClicked)
 
@@ -288,6 +291,24 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
                 return
             ListViewDoubleClickedAllItem(self.listView_mask)
             self.listView_mask.setCurrentIndex(self.listView_mask.model().index(-1, 0))
+
+    def __onDeviceControl(self):
+        if self.sender() == self.pushButton_clear:
+            res = self._module.DropSettingsFromFile()
+            if res == ERROR_CODE_ADB_PULL_NOT_EXIST:
+                # no need to clear, return success
+                res = ERROR_CODE_SUCCESS
+            self.__ShowMessage(res)
+
+    def __ShowMessage(self, errorCode):
+        if errorCode == ERROR_CODE_SUCCESS:
+            ShowMessageDialog(MESSAGE_TYPE_INFO, MESSAGE_STR_SUCCESS)
+        elif errorCode == ERROR_CODE_NO_DEVICE:
+            ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_NO_DEVICE)
+        elif errorCode == ERROR_CODE_ADB_PULL_FAILED:
+            ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_ADB_PULL_FAILED + "\n      %s" % CAMX_OVERRIDE_SETTINGS_PATH)
+        elif errorCode == ERROR_CODE_ADB_PUSH_FAILED:
+            ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_ADB_PUSH_FAILED + "\n      %s" % CAMX_OVERRIDE_SETTINGS_ROOT)
 
     def onParseSuccess(self):
         self._module.Update()
