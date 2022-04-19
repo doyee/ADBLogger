@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>406</width>
+    <height>430</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>adb logcat tool</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>10</y>
+      <width>401</width>
+      <height>361</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_main">
+     <property name="topMargin">
+      <number>10</number>
+     </property>
+     <property name="bottomMargin">
+      <number>10</number>
+     </property>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_device">
+       <property name="leftMargin">
+        <number>10</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>10</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label_device">
+         <property name="text">
+          <string>设备列表</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboBox_device_list">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_device_buttom">
+         <item>
+          <widget class="QPushButton" name="pushButton_root">
+           <property name="text">
+            <string>root &amp; remount</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_kill_cam">
+           <property name="text">
+            <string>kill Camera server</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QTabWidget" name="tabWidget_main">
+       <property name="tabShape">
+        <enum>QTabWidget::Rounded</enum>
+       </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <property name="elideMode">
+        <enum>Qt::ElideNone</enum>
+       </property>
+       <property name="tabsClosable">
+        <bool>false</bool>
+       </property>
+       <widget class="QWidget" name="tab_log_level">
+        <attribute name="title">
+         <string>log等级设置</string>
+        </attribute>
+        <widget class="QFrame" name="frame">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>401</width>
+           <height>251</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="tab_log_pull">
+        <attribute name="title">
+         <string>log拉取</string>
+        </attribute>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>406</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_setting">
+    <property name="title">
+     <string>设置</string>
+    </property>
+    <addaction name="action_general_settings"/>
+    <addaction name="action_log_level_settings"/>
+   </widget>
+   <widget class="QMenu" name="menu_device">
+    <property name="title">
+     <string>设备</string>
+    </property>
+    <addaction name="action_refresh_device_list"/>
+   </widget>
+   <addaction name="menu_setting"/>
+   <addaction name="menu_device"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_general_settings">
+   <property name="text">
+    <string>通用设置</string>
+   </property>
+  </action>
+  <action name="action_log_level_settings">
+   <property name="text">
+    <string>解析log等级设置</string>
+   </property>
+  </action>
+  <action name="action_refresh_device_list">
+   <property name="text">
+    <string>刷新设备列表</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
