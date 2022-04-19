@@ -172,11 +172,12 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
     # setupUi
 
     def _retranslateUi(self):
-        self.label_group.setText(QCoreApplication.translate("TabFrame", u"Group", None))
+        self.label_group.setText(QCoreApplication.translate("TabFrame", u"Group:", None))
         self.label_current_group.setText(QCoreApplication.translate("TabFrame", CURRENT_GROUP_PREFIX, None))
+        self.label_preview.setText(QCoreApplication.translate("TabFrame", u"预览:", None))
         self.pushButton_group_reset.setText(QCoreApplication.translate("TabFrame", u"\u91cd\u7f6e", None))
         self.pushButton_group_select_all.setText(QCoreApplication.translate("TabFrame", u"\u5168\u9009", None))
-        self.label_mask.setText(QCoreApplication.translate("TabFrame", u"Mask", None))
+        self.label_mask.setText(QCoreApplication.translate("TabFrame", u"Mask:", None))
         self.pushButton_mask_reset.setText(QCoreApplication.translate("TabFrame", u"\u91cd\u7f6e", None))
         self.pushButton_mask_select_all.setText(QCoreApplication.translate("TabFrame", u"\u5168\u9009", None))
         self.lineEdit_mask_search.setPlaceholderText(
