@@ -105,6 +105,9 @@ class LevelModule(ToolModule):
         group = text[:text.find("=")]
         return LOG_GROUPS.index(group)
 
+    def GetSelectedGroups(self):
+        return self.__selection.keys()
+
     def SearchMask(self, group, mask):
         if group == LOG_GROUPS[0]:
             try:
@@ -117,12 +120,50 @@ class LevelModule(ToolModule):
             except:
                 return -1
 
-    def DropSettingsFromFile(self):
-        # first pull out camxoverridesettings.txt
-        savingPath = JoinPath(GetAppDataDir(), CAMX_OVERRIDE_SETTINGS)
-        res = self._adb_manager.Pull(CAMX_OVERRIDE_SETTINGS_PATH, savingPath)
-        if not res == ERROR_CODE_SUCCESS:
-            return res
+    def LoadSettingsFromFile(self, path=None):
+        if path is not None:
+            savingPath = path
+        else:
+            savingPath = JoinPath(GetAppDataDir(), CAMX_OVERRIDE_SETTINGS)
+            res = self._adb_manager.Pull(CAMX_OVERRIDE_SETTINGS_PATH, savingPath)
+            if not res == ERROR_CODE_SUCCESS:
+                return res
+        f = open(savingPath, "r+")
+        loaded = self.__parseLogSettingsFile(f.readlines(), False)
+        self.__selection = {}
+        for line in loaded:
+            setting = line.rsplit("=")
+            try:
+                if setting[0] in LOG_GROUPS:
+                    bits = HexToBits(setting[1].replace("\n", ""))
+                    self.__selection[setting[0]] = []
+                    for bit in bits:
+                        if setting[0] == LOG_GROUPS[0]:
+                            self.__selection[setting[0]].append(OVERRIDE_LOG_MASK[bit])
+                        else:
+                            self.__selection[setting[0]].append(self.__camxLogMasks[0][bit])
+                else:
+                    for i in range(len(self.__enableMask)):
+                        if setting[0] == self.__enableMask[i][2]:
+                            value = bool(setting[1].replace("\n", ""))
+                            self.__enableMask[i] = (self.__enableMask[i][0], value, self.__enableMask[i][2])
+                            break
+            except Exception as e:
+                print(e)
+                return ERROR_CODE_LOAD_LOG_LEVEL_SETTINGS_FAILED
+        IF_Print(self.__selection)
+        IF_Print(self.__enableMask)
+        return ERROR_CODE_SUCCESS
+
+
+    def DropSettingsFromFile(self, path=None):
+        if path is not None:
+            savingPath = path
+        else:
+            savingPath = JoinPath(GetAppDataDir(), CAMX_OVERRIDE_SETTINGS)
+            res = self._adb_manager.Pull(CAMX_OVERRIDE_SETTINGS_PATH, savingPath)
+            if not res == ERROR_CODE_SUCCESS:
+                return res
         f = open(savingPath, "r+")
         toWrite = self.__parseLogSettingsFile(f.readlines(), True)
         f.close()

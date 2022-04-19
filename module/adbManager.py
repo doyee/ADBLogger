@@ -55,7 +55,7 @@ class ADBManager(object):
     def Push(self, src, dest):
         if self.__selectedDevice == -1:
             return ERROR_CODE_NO_DEVICE
-        cmd = "%s -s %s push %s %s" % (self.__adbPath, self.GetSelectedDeviceId(), src, dest)
+        cmd = "%s -s %s push` %s %s" % (self.__adbPath, self.GetSelectedDeviceId(), src, dest)
         IF_Print("cmd: %s" % cmd)
         result = RunCmdAndReturn(cmd)
         IF_Print(result)

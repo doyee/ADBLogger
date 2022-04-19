@@ -14,6 +14,7 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
     def __init__(self, module, parent=None):
         super().__init__(module, parent)
+        self.__checkBoxs = []
 
     def layoutFrame(self):
         self.verticalLayout_main = QVBoxLayout(self)
@@ -116,6 +117,7 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
             checkbox.setText(des)
             checkbox.setChecked(enableLogMask[i][1])
             checkbox.clicked.connect(self.__onCheckBoxChecked)
+            self.__checkBoxs.append(checkbox)
             self.horizontalLayout_check.addWidget(checkbox)
 
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
@@ -199,6 +201,7 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
         self.pushButton_mask_reset.clicked.connect(self.__onClearAndResetButtonClicked)
 
         self.pushButton_clear.clicked.connect(self.__onDeviceControl)
+        self.pushButton_load.clicked.connect(self.__onDeviceControl)
 
         self.listView_group.clicked.connect(self.__onListClicked)
         self.listView_group.doubleClicked.connect(self.__onListDoubleClicked)
@@ -300,6 +303,20 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
                 # no need to clear, return success
                 res = ERROR_CODE_SUCCESS
             self.__ShowMessage(res)
+        elif self.sender() == self.pushButton_load:
+            res = self._module.LoadSettingsFromFile()
+            self.__ShowMessage(res)
+            if res == ERROR_CODE_SUCCESS:
+                self.listView_mask.setModel(None)
+                selectedGroup = self._module.GetSelectedGroups()
+                FillupListViewWithHighlight(self, self.listView_group, self._module.GetGroups(), selectedGroup, LIST_SELECTED_COLOR)
+                self.listView_group.setCurrentIndex(self.listView_group.model().index(-1, 0))
+                enabled = self._module.GetEnableLogMasks()
+                for i in range(len(self.__checkBoxs)):
+                    self.__checkBoxs[i].setChecked(enabled[i][1])
+                selected = self._module.GetSelected()
+                FillupListView(self, self.listView_preview, selected)
+                self.onLogGroupSelectionChanged(True)
 
     def __ShowMessage(self, errorCode):
         if errorCode == ERROR_CODE_SUCCESS:

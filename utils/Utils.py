@@ -42,3 +42,17 @@ def Mkdir(path):
 
 def JoinPath(parent, child):
     return os.path.join(parent, child)
+
+def ConvertToHex(str):
+    return int(str, 16)
+
+def HexToBits(hex):
+    value = int(bin(int(hex, 16)), 2)
+    bits = []
+    i = 0
+    while value > 0:
+        if 1 & value > 0:
+            bits.append(i)
+        i += 1
+        value = value >> 1
+    return bits
