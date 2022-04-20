@@ -327,6 +327,8 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
             ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_ADB_PULL_FAILED + "\n      %s" % CAMX_OVERRIDE_SETTINGS_PATH)
         elif errorCode == ERROR_CODE_ADB_PUSH_FAILED:
             ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_ADB_PUSH_FAILED + "\n      %s" % CAMX_OVERRIDE_SETTINGS_ROOT)
+        elif errorCode == ERROR_CODE_LOAD_LOG_LEVEL_SETTINGS_FAILED:
+            ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_LOG_LEVEL_LOAD_FAILED)
 
     def onParseSuccess(self):
         self._module.Update()

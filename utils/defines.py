@@ -29,6 +29,7 @@ MESSAGE_STR_NO_MASK = "没有找到对应的Mask值。请重新解析后再尝�
 MESSAGE_STR_NO_DEVICE = "没有找到已连接的设备。请先连接设备，再做尝试。"
 MESSAGE_STR_ADB_PULL_FAILED = "从设备中拉去失败。请检查：\n    1.设备是否连接\n    2.设备连接状态\n    3.设备是否ROOT\n    4.设备内是否存在对应文件"
 MESSAGE_STR_ADB_PUSH_FAILED = "向设备中Push文件失败。请检查：\n    1.设备是否连接\n    2.设备连接状态\n    3.设备是否ROOT\n    4.设备内是否存在对应路径"
+MESSAGE_STR_LOG_LEVEL_LOAD_FAILED = "导入设备中的log等级设置失败，请检查：\n    1.设备中的设置文件是否有效\n    2.解析的log等级是否和设备的log等级匹配"
 
 WORKING_TYPE_PULL_AND_MERGE = 0
 WORKING_TYPE_MERGE = 1
