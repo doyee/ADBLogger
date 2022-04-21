@@ -163,6 +163,10 @@ class LogPullTabFrame(TabFrame):
     def __onTypeSelected(self):
         if self.sender() == self.radioButton_pull:
             self.__workingType = 1 << WORKING_TYPE_PULL_AND_MERGE
+            if self.checkBox_save_pull.isChecked():
+                self.__workingType |= 1 << WORKING_TYPE_PULL_AND_SAVE
+            else:
+                self.__workingType &= ~(1 << WORKING_TYPE_PULL_AND_SAVE)
         elif self.sender() == self.radioButton_merge:
             self.__workingType = 1 << WORKING_TYPE_MERGE
         elif self.sender() == self.checkBox_save_pull:
