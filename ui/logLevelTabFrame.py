@@ -161,6 +161,11 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
         self.horizontalLayout_buttons.addItem(self.horizontalSpacer_buttons)
 
+        self.pushButton_reset = QPushButton(self)
+        self.pushButton_reset.setObjectName(u"pushButton_reset")
+
+        self.horizontalLayout_buttons.addWidget(self.pushButton_reset)
+
         self.pushButton_apply = QPushButton(self)
         self.pushButton_apply.setObjectName(u"pushButton_apply")
 
@@ -192,6 +197,8 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
             QCoreApplication.translate("TabFrame", u"\u8bfb\u53d6\u8bbe\u5907\u9884\u8bbe", None))
         self.pushButton_clear.setText(
             QCoreApplication.translate("TabFrame", u"\u6e05\u9664\u8bbe\u5907\u9884\u8bbe", None))
+        self.pushButton_reset.setText(
+            QCoreApplication.translate("TabFrame", u"恢复默认值", None))
         self.pushButton_apply.setText(QCoreApplication.translate("TabFrame", u"\u5e94\u7528", None))
 
     # retranslateUi
@@ -205,7 +212,7 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
         self.pushButton_clear.clicked.connect(self.__onDeviceControl)
         self.pushButton_load.clicked.connect(self.__onDeviceControl)
-
+        self.pushButton_reset.clicked.connect(self.__onReset)
         self.pushButton_apply.clicked.connect(self.__onApply)
 
         self.listView_group.clicked.connect(self.__onListClicked)
@@ -322,6 +329,13 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
                 selected = self._module.GetSelected()
                 FillupListView(self, self.listView_preview, selected)
                 self.onLogGroupSelectionChanged(True)
+
+    def __onReset(self):
+        self.pushButton_group_reset.clicked.emit()
+        enabled = self._module.ResetEnableLogMask()
+        for i in range(len(self.__checkBoxs)):
+            self.__checkBoxs[i].setChecked(enabled[i][1])
+
 
     def __onApply(self):
         res = self._module.ApplySettings()

@@ -19,7 +19,7 @@ class LevelModule(ToolModule):
     def __init__(self):
         super().__init__()
         self.__camxLogMasks = None
-        self.__enableMask = LOG_MASK_ENABLE
+        self.__enableMask = LOG_MASK_ENABLE.copy()
         self.__selection = {}
         self.__listener = None
 
@@ -38,6 +38,10 @@ class LevelModule(ToolModule):
             if self.__enableMask[i][0] == mask:
                 self.__enableMask[i] = mask, isEnable, self.__enableMask[i][2]
                 break
+
+    def ResetEnableLogMask(self):
+        self.__enableMask = LOG_MASK_ENABLE
+        return self.__enableMask
 
     def SelectGroup(self, group):
         if len(self.__selection) > 0 and group in self.__selection.keys():
