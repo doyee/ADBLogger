@@ -1,7 +1,8 @@
 import io, os
+import time
 
 from utils.defines import *
-import subprocess
+import subprocess, re
 
 def IF_Print(*args, sep=' ', end='\n', file=None):
     if DEBUG_PRINT:
@@ -9,6 +10,15 @@ def IF_Print(*args, sep=' ', end='\n', file=None):
 
 def GetVersionStr():
     return "Version[UI:%s  Mod:%s  db:%d]" % (UI_VERSION, MODULE_VERSION, DB_VERSION)
+
+def StartDir(dir):
+    os.startfile(dir)
+
+def RunCmdAsync(cmd):
+    os.popen(cmd)
+
+def RunCmdSync(cmd):
+    os.system(cmd)
 
 def RunCmdAndReturn(cmd):
     proc = subprocess.Popen(cmd,
@@ -43,6 +53,20 @@ def Mkdir(path):
 def JoinPath(parent, child):
     return os.path.join(parent, child)
 
+def FindAllChildren(path):
+    for dirpath, dirnames, filenames in os.walk(path):
+        return filenames
+
+def MatchFileNames(files, regExp):
+    list = []
+    for file in files:
+        find = re.match(regExp, file)
+        print(file, find)
+        if find is not None:
+            list.append(file)
+    return list
+
+
 def ConvertToHex(str):
     return int(str, 16)
 
@@ -63,3 +87,6 @@ def ConvertListToLines(list):
         for element in list:
             toReturn.append( str(element) + "\n")
     return toReturn
+
+def GetTimestamp():
+    return int(time.time()*1000)
