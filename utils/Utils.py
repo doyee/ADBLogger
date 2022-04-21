@@ -56,3 +56,10 @@ def HexToBits(hex):
         i += 1
         value = value >> 1
     return bits
+
+def ConvertListToLines(list):
+    toReturn = []
+    if len(list) > 0:
+        for element in list:
+            toReturn.append( str(element) + "\n")
+    return toReturn

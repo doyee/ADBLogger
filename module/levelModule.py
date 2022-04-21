@@ -36,7 +36,7 @@ class LevelModule(ToolModule):
     def UpdateEnableLogMask(self, mask, isEnable):
         for i in range(len(self.__enableMask)):
             if self.__enableMask[i][0] == mask:
-                self.__enableMask[i] = mask, isEnable
+                self.__enableMask[i] = mask, isEnable, self.__enableMask[i][2]
                 break
 
     def SelectGroup(self, group):
@@ -124,7 +124,7 @@ class LevelModule(ToolModule):
         if path is not None:
             savingPath = path
         else:
-            savingPath = JoinPath(GetAppDataDir(), CAMX_OVERRIDE_SETTINGS)
+            savingPath = JoinPath(JoinPath(GetAppDataDir(), TOOLS_ROOT_DIR), CAMX_OVERRIDE_SETTINGS)
             res = self._adb_manager.Pull(CAMX_OVERRIDE_SETTINGS_PATH, savingPath)
             if not res == ERROR_CODE_SUCCESS:
                 return res
@@ -151,16 +151,15 @@ class LevelModule(ToolModule):
             except Exception as e:
                 print(e)
                 return ERROR_CODE_LOAD_LOG_LEVEL_SETTINGS_FAILED
-        IF_Print(self.__selection)
-        IF_Print(self.__enableMask)
+        IF_Print("log level selected: %s" % self.__selection)
+        IF_Print("log level eneabled: %s" % self.__enableMask)
         return ERROR_CODE_SUCCESS
-
 
     def DropSettingsFromFile(self, path=None):
         if path is not None:
             savingPath = path
         else:
-            savingPath = JoinPath(GetAppDataDir(), CAMX_OVERRIDE_SETTINGS)
+            savingPath = JoinPath(JoinPath(GetAppDataDir(), TOOLS_ROOT_DIR), CAMX_OVERRIDE_SETTINGS)
             res = self._adb_manager.Pull(CAMX_OVERRIDE_SETTINGS_PATH, savingPath)
             if not res == ERROR_CODE_SUCCESS:
                 return res
@@ -172,6 +171,33 @@ class LevelModule(ToolModule):
         f.close()
         res = self._adb_manager.Push(savingPath, CAMX_OVERRIDE_SETTINGS_ROOT[:-1])
         return res
+
+    def ApplySettings(self, path=None):
+        if path is not None:
+            savingPath = path
+        else:
+            savingPath = JoinPath(JoinPath(GetAppDataDir(), TOOLS_ROOT_DIR), CAMX_OVERRIDE_SETTINGS)
+            res = self._adb_manager.Pull(CAMX_OVERRIDE_SETTINGS_PATH, savingPath)
+            if not res == ERROR_CODE_SUCCESS:
+                return res
+
+        f = open(savingPath, "r+")
+        toWrite = self.__parseLogSettingsFile(f.readlines(), True)
+        f.close()
+        toWrite = toWrite + ConvertListToLines(self.GetSelected()) + ConvertListToLines(self.__getEnabledSettings())
+        f = open(savingPath, "w+")
+        f.writelines(toWrite)
+        f.close()
+
+        res = self._adb_manager.Push(savingPath, CAMX_OVERRIDE_SETTINGS_ROOT[:-1])
+        return res
+
+    def __getEnabledSettings(self):
+        enabled = []
+        for enable in self.__enableMask:
+            print(enable)
+            enabled.append("%s=%s" % (enable[2], str(enable[1]).upper()))
+        return enabled
 
     def __parseLogSettingsFile(self, lines, isExclude):
         toReturn = []

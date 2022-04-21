@@ -51,6 +51,7 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
         self.listView_group = QListView(self)
         self.listView_group.setObjectName(u"listView_group")
+        self.listView_group.setDragEnabled(False)
         self.__fillMaskList()
         self.verticalLayout_group.addWidget(self.listView_group)
 
@@ -98,6 +99,7 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
         self.listView_mask = QListView(self)
         self.listView_mask.setObjectName(u"listView_mask")
+        self.listView_mask.setDragEnabled(False)
 
         self.verticalLayout_mask.addWidget(self.listView_mask)
 
@@ -133,6 +135,7 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
         self.listView_preview = QListView(self)
         self.listView_preview.setObjectName(u"listView_preview")
+        self.listView_preview.setDragEnabled(False)
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -202,6 +205,8 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
 
         self.pushButton_clear.clicked.connect(self.__onDeviceControl)
         self.pushButton_load.clicked.connect(self.__onDeviceControl)
+
+        self.pushButton_apply.clicked.connect(self.__onApply)
 
         self.listView_group.clicked.connect(self.__onListClicked)
         self.listView_group.doubleClicked.connect(self.__onListDoubleClicked)
@@ -317,6 +322,10 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
                 selected = self._module.GetSelected()
                 FillupListView(self, self.listView_preview, selected)
                 self.onLogGroupSelectionChanged(True)
+
+    def __onApply(self):
+        res = self._module.ApplySettings()
+        self.__ShowMessage(res)
 
     def __ShowMessage(self, errorCode):
         if errorCode == ERROR_CODE_SUCCESS:
