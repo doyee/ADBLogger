@@ -55,6 +55,7 @@ else:
     CAMX_OVERRIDE_SETTINGS_ROOT = "/storage/emulated/0/test/"
     CAMX_OVERRIDE_SETTINGS = "test.txt"
 CAMX_OVERRIDE_SETTINGS_PATH = CAMX_OVERRIDE_SETTINGS_ROOT + CAMX_OVERRIDE_SETTINGS
+ANDROID_LOGS_ROOT = "/data/log/android_logs"
 
 TOOLS_ROOT_DIR = "adbTools"
 TOOLS_DB_MANE = "adbTools.db"

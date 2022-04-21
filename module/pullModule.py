@@ -11,6 +11,11 @@ class PullModule(ToolModule):
     def __init__(self):
         super().__init__()
 
+    def Pull(self, dst):
+        src = ANDROID_LOGS_ROOT
+        res = self._adb_manager.Pull(src, dst)
+        return res
+
     def Merge(self, src, dst):
         files = FindAllChildren(src)
         files = natsorted(MatchFileNames(files, "androidlog.*.gz"))
