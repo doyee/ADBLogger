@@ -234,7 +234,7 @@ class LevelModule(ToolModule):
         info = SQLManager.QueryInfo()
         info.Table = maskTable.Table
         info.Columns = [maskTable.Mask, maskTable.Value]
-        cursor = self._qsl_manager.Select(info)
+        cursor = self._sql_manager.Select(info)
         if cursor is not None:
             masks = []
             values = []

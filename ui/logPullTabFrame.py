@@ -5,6 +5,7 @@ from ui.tabFrame import TabFrame
 from ui.dropLineEditor import DropLineEditor
 from utils.Utils import *
 from utils.defines import *
+from module.pullModule import *
 
 class LogPullTabFrame(TabFrame):
     def __init__(self, module, parent=None):
@@ -160,6 +161,10 @@ class LogPullTabFrame(TabFrame):
         self.radioButton_merge.clicked.connect(self.__onTypeSelected)
         self.checkBox_save_pull.clicked.connect(self.__onTypeSelected)
 
+        self.pushButton_save_pull.clicked.connect(self.__onChooseDir)
+        self.pushButton_src.clicked.connect(self.__onChooseDir)
+        self.pushButton_dst.clicked.connect(self.__onChooseDir)
+
     def __onTypeSelected(self):
         if self.sender() == self.radioButton_pull:
             self.__workingType = 1 << WORKING_TYPE_PULL_AND_MERGE
@@ -189,4 +194,24 @@ class LogPullTabFrame(TabFrame):
         elif self.__workingType & 1 << WORKING_TYPE_MERGE:
             self.pushButton_run.setText(QCoreApplication.translate("TabFrame", u"开始合并", None))
 
+    def __onChooseDir(self):
+        if self.sender() == self.pushButton_src:
+            dir = self.__showDirPicker(DIR_PICKER_TYPE_LAST_SRC)
+        elif self.sender() == self.pushButton_dst:
+            dir = self.__showDirPicker(DIR_PICKER_TYPE_LAST_DST)
+        elif self.sender() == self.pushButton_save_pull:
+            dir = self.__showDirPicker(DIR_PICKER_TYPE_LAST_SAVING)
 
+    def __showDirPicker(self, type):
+        lastPath = self._module.GetLastSelectedDir(type)
+        dir = QFileDialog.getExistingDirectory(self,
+                                               "请选择目录",
+                                               lastPath)
+        if not dir == "":
+            self._module.UpdateLastSelectedDir(dir, type)
+            if type == DIR_PICKER_TYPE_LAST_DST:
+                self.lineEdit_dst.setText(dir)
+            elif type == DIR_PICKER_TYPE_LAST_SRC:
+                self.lineEdit_src.setText(dir)
+            elif type == DIR_PICKER_TYPE_LAST_SAVING:
+                self.lineEdit_save_pull.setText(dir)

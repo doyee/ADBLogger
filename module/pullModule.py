@@ -1,3 +1,6 @@
+from module.sqlManager import SQLManager
+from module.table import *
+from module.settingDefines import *
 from module.toolModule import ToolModule
 import gzip
 from re import *
@@ -6,6 +9,10 @@ from natsort import natsorted
 
 LOG_PREFIX = "androidlog"
 OUTPUT_PREFIX = "android_logs_"
+
+DIR_PICKER_TYPE_LAST_SRC = 0
+DIR_PICKER_TYPE_LAST_DST = 1
+DIR_PICKER_TYPE_LAST_SAVING = 2
 
 class PullModule(ToolModule):
     def __init__(self):
@@ -31,3 +38,19 @@ class PullModule(ToolModule):
         # TO-DO: check settings
         StartDir(dst)
         return ERROR_CODE_SUCCESS
+
+    def GetLastSelectedDir(self, type):
+        info = SQLManager.QueryInfo()
+        info.Table = settingTable.Table
+        info.Columns = [settingTable.Value]
+        info.Conditions = "%s=\"%s\"" % (settingTable.Name, SETTING_LAST_SRC_DIR if type == DIR_PICKER_TYPE_LAST_SRC else SETTING_LAST_DEST_DIR if type == DIR_PICKER_TYPE_LAST_DST else SETTING_LAST_ADB_PULL_SAVE_DIR)
+        return self._sql_manager.Select(info).fetchall()[0][0]
+
+    def UpdateLastSelectedDir(self, dir, type):
+        info = SQLManager.UpdateInfo()
+        info.Table = settingTable.Table
+        info.Columns = [settingTable.Value]
+        info.Values = [dir]
+        info.isChar = [True]
+        info.Conditions =  "%s=\"%s\"" % (settingTable.Name, SETTING_LAST_SRC_DIR if type == DIR_PICKER_TYPE_LAST_SRC else SETTING_LAST_DEST_DIR if type == DIR_PICKER_TYPE_LAST_DST else SETTING_LAST_ADB_PULL_SAVE_DIR)
+        self._sql_manager.Update(info)
