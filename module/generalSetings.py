@@ -19,6 +19,13 @@ class GeneralSettings(object):
             result = self.__sql_manager.Select(info).fetchall()[0]
             self.__convert_result(setting, result)
         IF_Print("General Settings: %s " % self.__settings)
+        return self.__settings
+
+    def Reset(self):
+        self.__settings = {}
+        for setting in GENERAL_SETTINGS_DEFAULT.keys():
+            self.__settings[setting] = GENERAL_SETTINGS_DEFAULT[setting][0]
+        return self.__settings
 
     def GetSettings(self):
         return self.__settings

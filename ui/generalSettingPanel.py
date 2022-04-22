@@ -91,11 +91,14 @@ class GeneralSettingPanel(SettingDialog):
         self.__label_file_exe.setText(QCoreApplication.translate("SettingDialog",u"",None))
         self._pushButton_apply.setText(QCoreApplication.translate("SetingDialog", u"应用", None))
         self.__pushButton_choose_exe.setText(QCoreApplication.translate("SetingDialog", u"更换应用程序", None))
+
         super().retranslateUi()
+        self._pushButton_reset.setText(QCoreApplication.translate("SetingDialog", u"恢复默认", None))
 
     def show(self):
         super(GeneralSettingPanel, self).show()
-        self._reset()
+        settings = self.__module.LoadSettings()
+        self.__updateUi(settings)
 
     def closeEvent(self, a0):
         QWidget.closeEvent(self, a0)
@@ -107,13 +110,8 @@ class GeneralSettingPanel(SettingDialog):
         self.__pushButton_choose_exe.clicked.connect(self.__onChangeFileExe)
 
     def _reset(self):
-        self.__module.LoadSettings()
-        settings = self.__module.GetSettings()
-        self.__checkBox_file.setChecked(settings[SETTING_OPEN_FILE])
-        self.__checkBox_dir.setChecked(settings[SETTING_OPEN_DIR])
-        self.__showFileExeLayout(self.__checkBox_file.isChecked())
-        self.__label_file_exe.setText("已选择使用%s打开合并后的log文件。" % self.__module.GetSetting(SETTING_OPEN_FILE_EXE) if self.__checkBox_file.isChecked() else "")
-
+        settings = self.__module.Reset()
+        self.__updateUi(settings)
 
     def _cancel(self):
         self.close()
@@ -154,3 +152,9 @@ class GeneralSettingPanel(SettingDialog):
     def __showFileExeLayout(self, isShow):
         self.__label_file_exe.setVisible(isShow)
         self.__pushButton_choose_exe.setVisible(isShow)
+
+    def __updateUi(self, settings):
+        self.__checkBox_file.setChecked(settings[SETTING_OPEN_FILE])
+        self.__checkBox_dir.setChecked(settings[SETTING_OPEN_DIR])
+        self.__showFileExeLayout(self.__checkBox_file.isChecked())
+        self.__label_file_exe.setText("已选择使用%s打开合并后的log文件。" % self.__module.GetSetting(SETTING_OPEN_FILE_EXE) if self.__checkBox_file.isChecked() else "")
