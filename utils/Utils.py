@@ -39,6 +39,12 @@ def RunCmdAndReturnList(cmd):
 def IsPathExsist(path):
     return os.path.exists(path)
 
+def GetHome():
+    return os.path.expanduser("~")
+
+def GetDesktop():
+    return os.path.join(GetHome(), "Desktop")
+
 def GetAppDataDir():
     return os.getenv('APPDATA')
 

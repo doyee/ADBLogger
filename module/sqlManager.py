@@ -23,11 +23,16 @@ class SQLManager(object):
         Columns = []
         Conditions = ""
 
+    class UpdateInfo(object):
+        Table = ""
+        Columns = []
+        Values = []
+        isChar = []
+        Conditions = ""
+
     def __init__(self):
         path = os.path.join(os.path.join(GetAppDataDir(), TOOLS_ROOT_DIR), TOOLS_DB_MANE)
         self.__db = sqlite3.connect(path)
-        # for t in tables:
-        #     self.CreateTable(t)
 
     @classmethod
     def get_instance(cls):
@@ -38,15 +43,17 @@ class SQLManager(object):
 
         return SQLManager._instance
 
-    def CreateTable(self, tableObj):
+    def CreateTable(self, tableObj:table):
         query = tableObj.create()
         try:
             self.__db.cursor().execute(query)
             self.__db.commit()
+            return True
         except:
             print("cannot create EXISTED table %s:\n%s" % (tableObj.Table, tableObj.create()))
+            return False
 
-    def DeleteTable(self, tableObj):
+    def DeleteTable(self, tableObj:table):
         query = tableObj.delete()
         try:
             self.__db.cursor().execute(query)
@@ -55,7 +62,7 @@ class SQLManager(object):
             print("cannot delete table %s", tableObj.Table)
 
 
-    def Insert(self, info):
+    def Insert(self, info:InsertInfo):
         query = """INSERT INTO %s (""" % info.Table
         for header in info.Headers:
             query += "%s," % header
@@ -75,7 +82,7 @@ class SQLManager(object):
             print("insertion error: %s" % query)
             return ERROR_CODE_DB_INSERT_FAILED
 
-    def Select(self, info):
+    def Select(self, info:QueryInfo):
         query = """SELECT """
         if len(info.Columns) == 0:
             query += "* FROM %s" % info.Table
@@ -94,3 +101,15 @@ class SQLManager(object):
         except:
             print("cannot do query %s" % query)
             return None
+
+    def Update(self, info:UpdateInfo):
+        query = """UPDATE %s SET""" % info.Table
+        for i in range(len(info.Columns)):
+            query = "%s %s=%s," % (query, info.Columns[i], str(info.Values[i]) if not info.isChar[i] else "\"%s\"" % str(info.Values[i]))
+        query = "%s WHERE %s;" % (query[:-1], info.Conditions)
+        IF_Print(query)
+        try:
+           self.__db.cursor().execute(query)
+           self.__db.commit()
+        except:
+            print("cannot do query %s" % query)

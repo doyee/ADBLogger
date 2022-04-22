@@ -27,4 +27,23 @@ class maskTable(table):
     def delete(self):
         return "DROP TABLE IF EXISTS %s" % self.Table
 
-tables = []
+class settingTable(table):
+    ## +----------------------------------------------------------------------------+
+    ## | id (int prim) | settingName (str) | settingValue (str) | settingType (str) |
+    ## +----------------------------------------------------------------------------+
+
+    Table = "SettingTable"
+    ID = "id"
+    Name = "settingName"
+    Value = "settingValue"
+    Type = "settingType"
+    Type_Str = "String"
+    Type_Int = "Int"
+    Type_Float = "Float"
+    Type_Bool = "BOOL"
+    Headers = [ID, Name, Value, Type]
+
+    def create(self):
+        return """CREATE TABLE %s (%s INT PRIMARY KEY NOT NULL, %s TEXT NOT NULL, %s TEXT NOT NULL, %s TEXT NOT NULL);""" % (self.Table, self.ID, self.Name, self.Value, self.Type)
+
+tables = [settingTable()]

@@ -1,3 +1,4 @@
+import traceback
 from ctypes import wintypes
 from time import sleep
 
@@ -134,7 +135,7 @@ class MainWindow(QMainWindow):
         self.__parserDialog.setupUi()
         self.__parserDialog.setWindowModality(Qt.ApplicationModal)
 
-        generalSettingPanelSize = (windowSize[0] * 2 / 3, windowSize[1] / 2)
+        generalSettingPanelSize = (windowSize[0] * 2 / 3, windowSize[1] / 3)
         self.__generalSettingDialog = GeneralSettingPanel(self, generalSettingPanelSize, GeneralSettings())
         self.__generalSettingDialog.setupUi()
         self.__generalSettingDialog.setWindowModality(Qt.ApplicationModal)
