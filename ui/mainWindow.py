@@ -164,7 +164,7 @@ class MainWindow(QMainWindow):
         self.action_log_level_settings.setText(QCoreApplication.translate("MainWindow", u"\u89e3\u6790log\u7b49\u7ea7\u8bbe\u7f6e", None))
         self.action_refresh_device_list.setText(QCoreApplication.translate("MainWindow", u"\u5237\u65b0\u8bbe\u5907\u5217\u8868", None))
         self.label_device.setText(QCoreApplication.translate("MainWindow", u"\u8bbe\u5907\u5217\u8868", None))
-        self.pushButton_root.setText(QCoreApplication.translate("MainWindow", u"root && remount", None))
+        self.pushButton_root.setText(QCoreApplication.translate("MainWindow", u"remount", None))
         self.pushButton_kill_cam.setText(QCoreApplication.translate("MainWindow", u"kill Camera server", None))
         self.tabWidget_main.setTabText(self.tabWidget_main.indexOf(self.tab_log_level), QCoreApplication.translate("MainWindow", u"log\u7b49\u7ea7\u8bbe\u7f6e", None))
         self.tabWidget_main.setTabText(self.tabWidget_main.indexOf(self.tab_log_pull), QCoreApplication.translate("MainWindow", u"log\u62c9\u53d6", None))
@@ -180,6 +180,8 @@ class MainWindow(QMainWindow):
         self.action_refresh_device_list.triggered.connect(self.__onMenu)
 
         self.device_changed.connect(self.__onUSBStateChanged)
+
+        self.pushButton_root.clicked.connect(self.__onRemount)
 
     def __onMenu(self):
         if self.sender() == self.action_log_level_settings:
@@ -201,6 +203,12 @@ class MainWindow(QMainWindow):
                 infos.append(infoStr)
             self.comboBox_device_list.addItems(infos)
         self.__onDeviceChanged()
+
+    def __onRemount(self):
+        res = self.__adbManager.Remount()
+        t, m = ErrorCodeToMessage(res)
+        ShowMessageDialog(t, m)
+
 
     def __onDeviceChanged(self):
         currentSelected = self.comboBox_device_list.currentIndex()

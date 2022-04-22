@@ -39,6 +39,27 @@ class ADBManager(object):
     def SetSelectedDevice(self, index):
         self.__selectedDevice = index
 
+    def Remount(self):
+        if self.__selectedDevice == -1:
+            return ERROR_CODE_NO_DEVICE
+        cmd = "%s -s %s root" % (self.__adbPath, self.GetSelectedDeviceId())
+        IF_Print("cmd: %s" % cmd)
+        res = RunCmdAndReturn(cmd)
+
+        if res.count("production builds") > 0:
+            return ERROR_CODE_PRODUCTION_DEVICE
+        elif not res == "":
+            return ERROR_CODE_UNKNOWN
+
+        cmd = "%s -s %s remount" % (self.__adbPath, self.GetSelectedDeviceId())
+        IF_Print("cmd: %s" % cmd)
+        res = RunCmdAndReturn(cmd)
+
+        if res.count("Not running as root") > 0:
+            return ERROR_CODE_REMOUNT_FAILED
+        else:
+            return ERROR_CODE_SUCCESS
+
     def Pull(self, src, dest):
         if self.__selectedDevice == -1:
             return ERROR_CODE_NO_DEVICE
