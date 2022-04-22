@@ -102,7 +102,8 @@ class MainWindow(QMainWindow):
         self.tabWidget_main.setCurrentWidget(self.tab_log_level)
         self.tab_log_pull = QWidget()
         self.tab_log_pull.setObjectName(u"tab_log_pull")
-        self.log_pull_frame = LogPullTabFrame(PullModule(), self.tab_log_pull)
+        settingModule = GeneralSettings()
+        self.log_pull_frame = LogPullTabFrame(PullModule(settingModule), self.tab_log_pull)
         self.log_pull_frame.setFrameShape(QFrame.StyledPanel)
         self.log_pull_frame.setFrameShadow(QFrame.Raised)
         self.tabWidget_main.addTab(self.tab_log_pull, "")
@@ -136,7 +137,7 @@ class MainWindow(QMainWindow):
         self.__parserDialog.setWindowModality(Qt.ApplicationModal)
 
         generalSettingPanelSize = (windowSize[0] * 2 / 3, windowSize[1] / 3)
-        self.__generalSettingDialog = GeneralSettingPanel(self, generalSettingPanelSize, GeneralSettings())
+        self.__generalSettingDialog = GeneralSettingPanel(self, generalSettingPanelSize, settingModule)
         self.__generalSettingDialog.setupUi()
         self.__generalSettingDialog.setWindowModality(Qt.ApplicationModal)
 

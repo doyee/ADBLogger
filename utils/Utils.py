@@ -67,7 +67,6 @@ def MatchFileNames(files, regExp):
     list = []
     for file in files:
         find = re.match(regExp, file)
-        print(file, find)
         if find is not None:
             list.append(file)
     return list

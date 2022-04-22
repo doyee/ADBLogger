@@ -15,8 +15,9 @@ DIR_PICKER_TYPE_LAST_DST = 1
 DIR_PICKER_TYPE_LAST_SAVING = 2
 
 class PullModule(ToolModule):
-    def __init__(self):
+    def __init__(self, settingModule):
         super().__init__()
+        self.__settingModule = settingModule
 
     def Pull(self, dst):
         src = ANDROID_LOGS_ROOT
@@ -29,14 +30,21 @@ class PullModule(ToolModule):
         fileName = "%s%d_merged.txt" % (OUTPUT_PREFIX, GetTimestamp())
         if files is None or len(files) == 0:
             return ERROR_CODE_EMPTY_LOG_DIR
-        f = open(JoinPath(dst, fileName), "ab+")
+        file = JoinPath(dst, fileName)
+        f = open(file, "ab+")
         for gz in files:
             g_file = gzip.GzipFile(JoinPath(src, gz)).read()
             f.write(g_file)
             f.write(bytes("\n", encoding="utf8"))
         f.close()
         # TO-DO: check settings
-        StartDir(dst)
+        self.__settingModule.LoadSettings()
+        if self.__settingModule.GetSetting(SETTING_OPEN_DIR):
+            StartDir(dst)
+        if self.__settingModule.GetSetting(SETTING_OPEN_FILE):
+            exe = self.__settingModule.GetSetting(SETTING_OPEN_FILE_EXE)
+            cmd = "\"%s\" \"%s\"" % (exe, file)
+            RunCmdAsync(cmd)
         return ERROR_CODE_SUCCESS
 
     def GetLastSelectedDir(self, type):

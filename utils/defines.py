@@ -32,6 +32,11 @@ MESSAGE_STR_NO_DEVICE = "没有找到已连接的设备。请先连接设备，�
 MESSAGE_STR_ADB_PULL_FAILED = "从设备中拉去失败。请检查：\n    1.设备是否连接\n    2.设备连接状态\n    3.设备是否ROOT\n    4.设备内是否存在对应文件"
 MESSAGE_STR_ADB_PUSH_FAILED = "向设备中Push文件失败。请检查：\n    1.设备是否连接\n    2.设备连接状态\n    3.设备是否ROOT\n    4.设备内是否存在对应路径"
 MESSAGE_STR_LOG_LEVEL_LOAD_FAILED = "导入设备中的log等级设置失败，请检查：\n    1.设备中的设置文件是否有效\n    2.解析的log等级是否和设备的log等级匹配"
+MESSAGE_STR_SRC_DIR_EMPTY = "无效的路径。请检查所选择的路径。"
+MESSAGE_STR_SAVE_DIR_EMPTY = "无效的保存路径。请检查从设备拉取的保存路径。"
+MESSAGE_STR_MERGE_DST_EMPTY = "无效的输出路径。请检查合并后log输出的路径。"
+MESSAGE_STR_EMPTY_LOG_DIR = "请选择有含有androidlog .gz的目录。"
+MESSAGE_STR_UNKNOWN_ERROR = "未知错误。"
 
 WORKING_TYPE_PULL_AND_MERGE = 0
 WORKING_TYPE_MERGE = 1
@@ -47,19 +52,35 @@ DEVICE_INFO_ID = "deviceId"
 DEVICE_INFO_NAME = "deviceName"
 DEVICE_INFO_STATUS = "deviceStatus"
 
-
-
 if not DEBUG:
     CAMX_OVERRIDE_SETTINGS_ROOT = "/vendor/etc/camera/"
     CAMX_OVERRIDE_SETTINGS = "camxoverridesettings.txt"
+    ANDROID_LOGS_ROOT = "/data/log/android_logs"
 else:
     CAMX_OVERRIDE_SETTINGS_ROOT = "/storage/emulated/0/test/"
     CAMX_OVERRIDE_SETTINGS = "test.txt"
+    ANDROID_LOGS_ROOT = "/storage/emulated/0/test/android_logs"
 CAMX_OVERRIDE_SETTINGS_PATH = CAMX_OVERRIDE_SETTINGS_ROOT + CAMX_OVERRIDE_SETTINGS
-ANDROID_LOGS_ROOT = "/data/log/android_logs"
+
 
 TOOLS_ROOT_DIR = "adbTools"
 TOOLS_DB_MANE = "adbTools.db"
 
 LIST_SELECTED_COLOR = QColor(0, 0, 255, 100)
 LIST_NORMAL_COLOR = QColor(255, 255, 255, 255)
+
+def ErrorCodeToMessage(errorCode):
+    if errorCode == ERROR_CODE_SUCCESS:
+        return MESSAGE_TYPE_INFO, MESSAGE_STR_SUCCESS
+    elif errorCode == ERROR_CODE_NO_DEVICE:
+        return MESSAGE_TYPE_WARNING, MESSAGE_STR_NO_DEVICE
+    elif errorCode == ERROR_CODE_ADB_PULL_FAILED or errorCode == ERROR_CODE_ADB_PULL_NOT_EXIST:
+        return MESSAGE_TYPE_WARNING, MESSAGE_STR_ADB_PULL_FAILED
+    elif errorCode == ERROR_CODE_ADB_PUSH_FAILED:
+        return MESSAGE_TYPE_WARNING, MESSAGE_STR_ADB_PUSH_FAILED
+    elif errorCode == ERROR_CODE_LOAD_LOG_LEVEL_SETTINGS_FAILED:
+        return MESSAGE_TYPE_WARNING, MESSAGE_STR_LOG_LEVEL_LOAD_FAILED
+    elif errorCode == ERROR_CODE_EMPTY_LOG_DIR:
+        return MESSAGE_TYPE_WARNING, MESSAGE_STR_EMPTY_LOG_DIR
+    else:
+        return MESSAGE_TYPE_WARNING, MESSAGE_STR_UNKNOWN_ERROR

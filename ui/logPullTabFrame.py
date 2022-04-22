@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 from ui.tabFrame import TabFrame
 from ui.dropLineEditor import DropLineEditor
 from utils.Utils import *
+from utils.UIUtils import *
 from utils.defines import *
 from module.pullModule import *
 
@@ -146,7 +147,7 @@ class LogPullTabFrame(TabFrame):
         self.radioButton_pull.setText(QCoreApplication.translate("TabFrame", u"\u4ece\u8bbe\u5907\u62c9\u53d6\u5e76\u5408\u5e76", None))
         self.radioButton_merge.setText(QCoreApplication.translate("TabFrame", u"\u5408\u5e76\u672c\u5730log", None))
         self.checkBox_save_pull.setText(QCoreApplication.translate("TabFrame", u"\u5c06\u62c9\u53d6\u7684log\u4fdd\u5b58\u5230\u6307\u5b9a\u76ee\u5f55", None))
-        self.label_save_pull.setText(QCoreApplication.translate("TabFrame", u"\u82e5\u4e0d\u6307\u5b9a\uff0c\u5c06\u4fdd\u5b58\u5728loig\u5408\u5e76\u540e\u8f93\u51fa\u7684\u76ee\u5f55", None))
+        self.label_save_pull.setText(QCoreApplication.translate("TabFrame", u"\u82e5\u4e0d\u6307\u5b9a\uff0c\u5c06\u4fdd\u5b58\u5728log\u5408\u5e76\u540e\u8f93\u51fa\u7684\u76ee\u5f55", None))
         self.lineEdit_save_pull.setPlaceholderText(QCoreApplication.translate("TabFrame", u"\u9009\u62e9/\u8f93\u5165/\u62d6\u5165 adb\u62c9\u53d6\u4fdd\u5b58\u76ee\u5f55", None))
         self.pushButton_save_pull.setText(QCoreApplication.translate("TabFrame", u"\u9009\u62e9\u76ee\u5f55", None))
         self.lineEdit_src.setPlaceholderText(QCoreApplication.translate("TabFrame", u"\u9009\u62e9/\u8f93\u5165/\u62d6\u5165 \u672c\u5730log\u8def\u5f84", None))
@@ -164,6 +165,8 @@ class LogPullTabFrame(TabFrame):
         self.pushButton_save_pull.clicked.connect(self.__onChooseDir)
         self.pushButton_src.clicked.connect(self.__onChooseDir)
         self.pushButton_dst.clicked.connect(self.__onChooseDir)
+
+        self.pushButton_run.clicked.connect(self.__onWork)
 
     def __onTypeSelected(self):
         if self.sender() == self.radioButton_pull:
@@ -197,10 +200,16 @@ class LogPullTabFrame(TabFrame):
     def __onChooseDir(self):
         if self.sender() == self.pushButton_src:
             dir = self.__showDirPicker(DIR_PICKER_TYPE_LAST_SRC)
+            if not dir == "":
+                self.lineEdit_src.setText(dir)
         elif self.sender() == self.pushButton_dst:
             dir = self.__showDirPicker(DIR_PICKER_TYPE_LAST_DST)
+            if not dir == "":
+                self.lineEdit_dst.setText(dir)
         elif self.sender() == self.pushButton_save_pull:
             dir = self.__showDirPicker(DIR_PICKER_TYPE_LAST_SAVING)
+            if not dir == "":
+                self.lineEdit_save_pull.setText(dir)
 
     def __showDirPicker(self, type):
         lastPath = self._module.GetLastSelectedDir(type)
@@ -209,9 +218,41 @@ class LogPullTabFrame(TabFrame):
                                                lastPath)
         if not dir == "":
             self._module.UpdateLastSelectedDir(dir, type)
-            if type == DIR_PICKER_TYPE_LAST_DST:
-                self.lineEdit_dst.setText(dir)
-            elif type == DIR_PICKER_TYPE_LAST_SRC:
-                self.lineEdit_src.setText(dir)
-            elif type == DIR_PICKER_TYPE_LAST_SAVING:
-                self.lineEdit_save_pull.setText(dir)
+        return dir
+
+    def __onWork(self):
+        if self.lineEdit_dst.text() == "":
+            ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_MERGE_DST_EMPTY)
+            return
+        src = ""
+        dst = self.lineEdit_dst.text()
+
+        # check if pull
+        if self.__workingType & 1 << WORKING_TYPE_PULL_AND_MERGE:
+            # check if save
+            if self.__workingType & 1 << WORKING_TYPE_PULL_AND_SAVE:
+                if self.lineEdit_save_pull.text() == "":
+                    ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_SAVE_DIR_EMPTY)
+                else:
+                    src = self.lineEdit_save_pull.text()
+            else:
+                src = dst
+            # pull
+            res = self._module.Pull(src)
+            if not res == ERROR_CODE_SUCCESS:
+                type, msg = ErrorCodeToMessage(res)
+                ShowMessageDialog(type, msg)
+                return
+            src = JoinPath(src, "android_logs")
+        elif self.__workingType & 1 << WORKING_TYPE_MERGE:
+            # check src dir
+            if self.lineEdit_src.text() == "":
+                ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_SRC_DIR_EMPTY)
+            else:
+                src = self.lineEdit_src.text()
+
+        # merge
+        res = self._module.Merge(src, dst)
+        if not res == ERROR_CODE_SUCCESS:
+            t, m = ErrorCodeToMessage(res)
+            ShowMessageDialog(t, m)

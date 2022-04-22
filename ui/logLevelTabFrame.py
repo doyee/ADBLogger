@@ -342,16 +342,12 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
         self.__ShowMessage(res)
 
     def __ShowMessage(self, errorCode):
-        if errorCode == ERROR_CODE_SUCCESS:
-            ShowMessageDialog(MESSAGE_TYPE_INFO, MESSAGE_STR_SUCCESS)
-        elif errorCode == ERROR_CODE_NO_DEVICE:
-            ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_NO_DEVICE)
-        elif errorCode == ERROR_CODE_ADB_PULL_FAILED:
-            ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_ADB_PULL_FAILED + "\n      %s" % CAMX_OVERRIDE_SETTINGS_PATH)
+        type, msg = ErrorCodeToMessage(errorCode)
+        if errorCode == ERROR_CODE_ADB_PULL_FAILED:
+            msg = "%s\n      %s" % msg, CAMX_OVERRIDE_SETTINGS_PATH
         elif errorCode == ERROR_CODE_ADB_PUSH_FAILED:
-            ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_ADB_PUSH_FAILED + "\n      %s" % CAMX_OVERRIDE_SETTINGS_ROOT)
-        elif errorCode == ERROR_CODE_LOAD_LOG_LEVEL_SETTINGS_FAILED:
-            ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_LOG_LEVEL_LOAD_FAILED)
+            msg = "%s\n      %s" % msg ,CAMX_OVERRIDE_SETTINGS_ROOT
+        ShowMessageDialog(type, msg)
 
     def onParseSuccess(self):
         self._module.Update()
