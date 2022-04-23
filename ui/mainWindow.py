@@ -1,3 +1,4 @@
+import threading
 import traceback
 from ctypes import wintypes
 from time import sleep
@@ -23,6 +24,30 @@ from utils.Utils import *
 TITLE_PREFIX = "adb logcat tool"
 
 class MainWindow(QMainWindow):
+
+    class DeviceThread(threading.Thread):
+        def __init__(self, adbManager, comboBox, callback, delay):
+            threading.Thread.__init__(self)
+            self.__adbManager = adbManager
+            self.__comboBox = comboBox
+            self.__callback = callback
+            self.__delay = delay
+
+        def run(self):
+            sleep(self.__delay)
+
+            deviceInfo = self.__adbManager.GetDeviceInfo(True)
+            self.__comboBox.clear()
+            if not deviceInfo == None:
+                infos = []
+                for info in deviceInfo:
+                    infoStr = " %s: %s \t [Status:%s]" % (
+                        info[DEVICE_INFO_NAME], info[DEVICE_INFO_ID], info[DEVICE_INFO_STATUS])
+                    infos.append(infoStr)
+                self.__comboBox.addItems(infos)
+            self.__callback()
+
+
     device_changed = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
@@ -31,7 +56,6 @@ class MainWindow(QMainWindow):
         self.__deviceInfo = []
         displaySize = GetWindowSize()
         self.setupUi(self, (displaySize[0] / 3, displaySize[1] * 3 / 5))
-        self.__updateDevice()
 
     def setupUi(self, MainWindow, windowSize):
         if not MainWindow.objectName():
@@ -145,6 +169,9 @@ class MainWindow(QMainWindow):
         self.__connectUi()
 
         QMetaObject.connectSlotsByName(MainWindow)
+
+        t = self.DeviceThread(self.__adbManager, self.comboBox_device_list, self.__onDeviceChanged, 0)
+        t.start()
     # setupUi
 
     def show(self, isFirstTime):
