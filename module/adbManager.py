@@ -60,6 +60,18 @@ class ADBManager(object):
         else:
             return ERROR_CODE_SUCCESS
 
+    def Mkdir(self, dir):
+        if self.__selectedDevice == -1:
+            return ERROR_CODE_NO_DEVICE
+        cmd = "%s -s %s shell mkdir %s" % (self.__adbPath, self.GetSelectedDeviceId(), dir)
+        IF_Print(cmd)
+        result = RunCmdAndReturn(cmd)
+        IF_Print(result)
+        if result == "" or result.count("exists") > 0:
+            return ERROR_CODE_SUCCESS
+        else:
+            return ERROR_CODE_ADB_MKDIR_FAILED
+
     def Pull(self, src, dest):
         if self.__selectedDevice == -1:
             return ERROR_CODE_NO_DEVICE

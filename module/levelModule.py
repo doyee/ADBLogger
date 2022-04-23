@@ -149,7 +149,7 @@ class LevelModule(ToolModule):
                 else:
                     for i in range(len(self.__enableMask)):
                         if setting[0] == self.__enableMask[i][2]:
-                            value = bool(setting[1].replace("\n", ""))
+                            value = True if setting[1].replace("\n", "").upper() == "TRUE" else False
                             self.__enableMask[i] = (self.__enableMask[i][0], value, self.__enableMask[i][2])
                             break
             except Exception as e:
@@ -177,22 +177,24 @@ class LevelModule(ToolModule):
         return res
 
     def ApplySettings(self, path=None):
+        res = ERROR_CODE_SUCCESS
         if path is not None:
             savingPath = path
         else:
             savingPath = JoinPath(JoinPath(GetAppDataDir(), TOOLS_ROOT_DIR), CAMX_OVERRIDE_SETTINGS)
             res = self._adb_manager.Pull(CAMX_OVERRIDE_SETTINGS_PATH, savingPath)
-            if not res == ERROR_CODE_SUCCESS:
-                return res
-
-        f = open(savingPath, "r+")
-        toWrite = self.__parseLogSettingsFile(f.readlines(), True)
-        f.close()
+        toWrite = []
+        if res == ERROR_CODE_SUCCESS:
+            f = open(savingPath, "r+")
+            toWrite = self.__parseLogSettingsFile(f.readlines(), True)
+            f.close()
         toWrite = toWrite + ConvertListToLines(self.GetSelected()) + ConvertListToLines(self.__getEnabledSettings())
         f = open(savingPath, "w+")
         f.writelines(toWrite)
         f.close()
-
+        res = self._adb_manager.Mkdir(CAMX_OVERRIDE_SETTINGS_ROOT)
+        if not res == ERROR_CODE_SUCCESS:
+            return res
         res = self._adb_manager.Push(savingPath, CAMX_OVERRIDE_SETTINGS_ROOT[:-1])
         return res
 

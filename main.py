@@ -30,8 +30,8 @@ def launchCheck():
         path = os.path.join(path, TOOLS_DB_MANE)
         if not IsDbExist(path):
             firstTimeFlag = True
-    # if firstTimeFlag:
-    Init_DB()
+    if firstTimeFlag:
+        Init_DB()
     return firstTimeFlag
 
 if __name__ == '__main__':
