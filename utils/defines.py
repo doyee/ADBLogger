@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QColor
 
-DEBUG = True
+DEBUG = False
 DEBUG_PRINT = True
 
 # ERROR CODE

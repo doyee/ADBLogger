@@ -63,6 +63,7 @@ class MainWindow(QMainWindow):
         MainWindow.resize(windowSize[0], windowSize[1])
         MainWindow.setMaximumSize(windowSize[0], windowSize[1])
         MainWindow.setMinimumSize(windowSize[0], windowSize[1])
+        MainWindow.setWindowIcon(QIcon('icon/icon.ico'))
         IF_Print("windowSize = %d,%d" % (windowSize[0], windowSize[1]))
 
         self.action_general_settings = QAction(MainWindow)

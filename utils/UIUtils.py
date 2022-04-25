@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QIcon
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from utils.defines import *
 
@@ -11,10 +11,12 @@ def GetWindowSize():
 def ShowMessageDialog(msgType, msg):
     if msgType == MESSAGE_TYPE_INFO:
         messageBox = QMessageBox(QMessageBox.Warning, "提示", msg)
+        messageBox.setWindowIcon(QIcon('icon/icon.ico'))
         messageBox.addButton(u"完成", QMessageBox.YesRole)
         messageBox.exec_()
     elif msgType == MESSAGE_TYPE_WARNING:
         messageBox = QMessageBox(QMessageBox.Warning, "警告", msg)
+        messageBox.setWindowIcon(QIcon('icon/icon.ico'))
         messageBox.addButton(u"关闭", QMessageBox.YesRole)
         messageBox.exec_()
 
