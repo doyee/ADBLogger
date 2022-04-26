@@ -18,7 +18,7 @@ def launchCheck():
     hasAdb = ADBManager.get_instance().CheckADB()
     if not hasAdb:
         ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_ADB_ERROR_QUIT)
-        exit(0)
+        sys.exit(0)
 
     # 2. check cache dir
     path = os.path.join(GetAppDataDir(), TOOLS_ROOT_DIR)
