@@ -255,8 +255,9 @@ class LogLevelTabFrame(TabFrame, LogLevelParserListener, LogMaskSelectionListene
         elif self.sender() == self.listView_preview:
             idx = self._module.GetSelectedGroup(self.listView_preview.currentIndex().data())
             i = self.listView_group.model().index(idx, 0)
-            self.listView_group.clicked.emit(i)
             self.listView_group.setCurrentIndex(i)
+            self.listView_group.clicked.emit(i)
+
 
 
     def __onListDoubleClicked(self, index):
