@@ -11,6 +11,7 @@ from utils.UIUtils import *
 from module.sqlManager import *
 from module.adbManager import *
 from module.settingDefines import *
+from module.shortcutModule import ShortcutModule
 
 def launchCheck():
     firstTimeFlag = False
@@ -35,10 +36,13 @@ def launchCheck():
     return firstTimeFlag
 
 if __name__ == '__main__':
-
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     app = QApplication(sys.argv)
-    firstTime = launchCheck()
-    window = MainWindow()
-    window.show(firstTime)
-    sys.exit(app.exec_())
+    if len(sys.argv) > 1:
+        shortcut = ShortcutModule()
+        sys.exit(0)
+    else:
+        firstTime = launchCheck()
+        window = MainWindow()
+        window.show(firstTime)
+        sys.exit(app.exec_())

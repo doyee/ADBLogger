@@ -24,6 +24,21 @@ class PullModule(ToolModule):
         res = self._adb_manager.Pull(src, dst)
         return res
 
+    def ShortcutMerge(self, src):
+        files = FindAllChildren(src)
+        files = natsorted(MatchFileNames(files, "androidlog.*.gz"))
+        fileName = "%s%d_merged.txt" % (OUTPUT_PREFIX, GetTimestamp())
+        if files is None or len(files) == 0:
+            return ERROR_CODE_EMPTY_LOG_DIR
+        file = JoinPath(src, fileName)
+        f = open(file, "ab+")
+        for gz in files:
+            g_file = gzip.GzipFile(JoinPath(src, gz)).read()
+            f.write(g_file)
+            f.write(bytes("\n", encoding="utf8"))
+        f.close()
+        return ERROR_CODE_SUCCESS
+
     def Merge(self, src, dst):
         files = FindAllChildren(src)
         files = natsorted(MatchFileNames(files, "androidlog.*.gz"))
