@@ -26,7 +26,7 @@ class PullModule(ToolModule):
 
     def ShortcutMerge(self, src):
         files = FindAllChildren(src)
-        files = natsorted(MatchFileNames(files, "androidlog.*.gz"))
+        files = natsorted(MatchFileNames(files, "applogcat-log.*.gz"))
         fileName = "%s%d_merged.txt" % (OUTPUT_PREFIX, GetTimestamp())
         if files is None or len(files) == 0:
             return ERROR_CODE_EMPTY_LOG_DIR
@@ -41,7 +41,7 @@ class PullModule(ToolModule):
 
     def Merge(self, src, dst):
         files = FindAllChildren(src)
-        files = natsorted(MatchFileNames(files, "androidlog.*.gz"))
+        files = natsorted(MatchFileNames(files, "applogcat-log.*.gz"))
         fileName = "%s%d_merged.txt" % (OUTPUT_PREFIX, GetTimestamp())
         if files is None or len(files) == 0:
             return ERROR_CODE_EMPTY_LOG_DIR
