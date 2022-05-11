@@ -2,6 +2,7 @@ from PyQt5.QtGui import QColor
 
 DEBUG = False
 DEBUG_PRINT = True
+IS_BETA = True
 
 # ERROR CODE
 ERROR_CODE_BASE = 0
@@ -52,7 +53,7 @@ WORKING_TYPE_PULL_AND_SAVE = 2
 UI_VERSION = "1.0.0.0"
 MODULE_VERSION = "1.0.0.2"
 DB_VERSION = 1
-
+VERSION = "1.0.0.2"
 
 DEVICE_INFO_ID = "deviceId"
 DEVICE_INFO_NAME = "deviceName"
@@ -67,6 +68,9 @@ else:
     CAMX_OVERRIDE_SETTINGS = "test.txt"
     ANDROID_LOGS_ROOT = "/storage/emulated/0/test/android_logs"
 CAMX_OVERRIDE_SETTINGS_PATH = CAMX_OVERRIDE_SETTINGS_ROOT + CAMX_OVERRIDE_SETTINGS
+
+GIT_ACCOUNT = "GiddensA"
+GIT_REPO = "adbLogcatTool"
 
 
 TOOLS_ROOT_DIR = "adbTools"
