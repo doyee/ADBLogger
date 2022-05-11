@@ -1,15 +1,15 @@
 from abc import abstractmethod
+from ui.noWindowHintDialog import NoWindowDialog
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 
-class SettingDialog(QDialog):
+class SettingDialog(NoWindowDialog):
 
     def __init__(self, parent, size):
         super(SettingDialog, self).__init__(parent)
-        self.setWindowFlags(Qt.WindowTitleHint | Qt.CustomizeWindowHint | Qt.Dialog)
         self.resize(size[0], size[1])
         self.setMinimumSize(size[0], size[1])
         self.setMaximumSize(size[0], size[1])

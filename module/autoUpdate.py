@@ -1,7 +1,11 @@
+import time
+
 import requests
 import os, re
 from utils.defines import *
 from utils.UIUtils import *
+from utils.Utils import *
+
 from module.sqlManager import SQLManager
 GIT_API_URL = "https://api.github.com/repos/%s/%s/releases/latest" % (GIT_ACCOUNT, GIT_REPO)
 
@@ -10,17 +14,20 @@ class AutoUpdate(object):
         self.__db = SQLManager.get_instance()
         self.__latestReleaseInfo = {}
         size = GetWindowSize()
-        self.__checkUpdateDialog = UpdateDialog((size[0] / 4, size[1] / 6))
+        self.__checkUpdateDialog = UpdateDialog((size[0] / 4, size[1] / 6), self)
+        self.__downloadDialog = DownloadDialog((size[0]/ 4, size[1]/ 8))
 
-    def CheckUpdate(self):
+    def CheckUpdate(self, isForce=False):
         self.__latestReleaseInfo = requests.get(url=GIT_API_URL).json()
         latestVersion = self.__latestReleaseInfo["tag_name"]
-        print(latestVersion)
         isUpdate, latestVersion = self.__checkVersion(latestVersion)
         if (isUpdate):
             self.__checkUpdateDialog.show(latestVersion)
 
-
+    def Download(self):
+        path = JoinPath(GetAppDataDir(), TOOLS_ROOT_DIR)
+        print(path)
+        self.__downloadDialog.show()
 
     def __checkVersion(self, version):
         v = re.findall("\d+.\d+.\d+.\d+", version)[0]
@@ -38,14 +45,14 @@ class AutoUpdate(object):
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from ui.noWindowHintDialog import NoWindowDialog
 
+class UpdateDialog(NoWindowDialog):
 
-class UpdateDialog(QDialog):
-
-    def __init__(self, size, parent=None):
+    def __init__(self, size, module, parent=None):
         super(UpdateDialog, self).__init__(parent)
         self.__size = size
-        self.setWindowFlags(Qt.WindowTitleHint | Qt.CustomizeWindowHint | Qt.Dialog)
+        self.__module = module
 
     def show(self, latestVersion) -> None:
         self.__latestVersion = latestVersion
@@ -113,11 +120,15 @@ class UpdateDialog(QDialog):
 
         self.verticalLayout.addLayout(self.horizontalLayout)
 
-
+        self.__connectUI()
         self.retranslateUi(Dialog)
 
         QMetaObject.connectSlotsByName(Dialog)
     # setupUi
+
+    def __connectUI(self):
+        self.pushButton_ignore.clicked.connect(self.__ignore)
+        self.pushButton_update.clicked.connect(self.__update)
 
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"在线更新", None))
@@ -129,5 +140,93 @@ class UpdateDialog(QDialog):
         self.pushButton_update.setText(QCoreApplication.translate("Dialog", u"\u7acb\u5373\u66f4\u65b0", None))
     # retranslateUi
 
+    def __ignore(self):
+        self.close()
+
+    def __update(self):
+        self.__module.Download()
+        self.close()
+
+DOWNLOAD_TIMER_STEP = 100  # ms
+
+class DownloadDialog(NoWindowDialog):
+    def __init__(self, size, parent=None):
+        super(DownloadDialog, self).__init__(parent)
+        self.__size = size
+        self.__timer = None
+        self.setupUi(self)
+
+    def show(self) -> None:
+        super().show()
+        self.__timer = QBasicTimer()
+        self.__timer.start(DOWNLOAD_TIMER_STEP, self)
+
+
+    def setupUi(self, Dialog):
+        if not Dialog.objectName():
+            Dialog.setObjectName(u"Dialog")
+        Dialog.resize(self.__size[0], self.__size[1])
+        self.verticalLayoutWidget = QWidget(Dialog)
+        self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
+        self.verticalLayoutWidget.setGeometry(QRect(0, 0, self.__size[0], self.__size[1]))
+        self.verticalLayout = QVBoxLayout(self.verticalLayoutWidget)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(10, 10, 10, 10)
+        self.labeltitle = QLabel(self.verticalLayoutWidget)
+        self.labeltitle.setObjectName(u"labeltitle")
+
+        self.verticalLayout.addWidget(self.labeltitle)
+
+        self.progressBar = QProgressBar(self.verticalLayoutWidget)
+        self.progressBar.setObjectName(u"progressBar")
+        self.progressBar.setValue(24)
+
+        self.verticalLayout.addWidget(self.progressBar)
+
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.label_download_speed = QLabel(self.verticalLayoutWidget)
+        self.label_download_speed.setObjectName(u"label_download_speed")
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_download_speed.sizePolicy().hasHeightForWidth())
+        self.label_download_speed.setSizePolicy(sizePolicy)
+
+        self.horizontalLayout.addWidget(self.label_download_speed)
+
+        self.label_4 = QLabel(self.verticalLayoutWidget)
+        self.label_4.setObjectName(u"label_4")
+        sizePolicy.setHeightForWidth(self.label_4.sizePolicy().hasHeightForWidth())
+        self.label_4.setSizePolicy(sizePolicy)
+
+        self.horizontalLayout.addWidget(self.label_4)
+
+        self.verticalLayout.addLayout(self.horizontalLayout)
+
+        self.retranslateUi(Dialog)
+
+        QMetaObject.connectSlotsByName(Dialog)
+
+        # setupUi
+
+    def retranslateUi(self, Dialog):
+        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"在线更新", None))
+        self.labeltitle.setText(
+            QCoreApplication.translate("Dialog", u"\u6b63\u5728\u4e0b\u8f7d\uff0c\u8bf7\u7a0d\u540e...", None))
+        self.label_download_speed.setText(
+            QCoreApplication.translate("Dialog", u"\u5f53\u524d\u4e0b\u8f7d\u901f\u5ea6:", None))
+        self.label_4.setText(
+            QCoreApplication.translate("Dialog", u"\u9884\u8ba1\u5269\u4f59\u65f6\u95f4\uff1a", None))
+        # retranslateUi
+
+
+
+    def timerEvent(self, a0: 'QTimerEvent') -> None:
+        print(time.time(), "helloworld" )
+        self.__updateProgress()
+
+    def __updateProgress(self):
+        pass
 
 
