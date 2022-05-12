@@ -95,3 +95,12 @@ def ConvertListToLines(list):
 
 def GetTimestamp():
     return int(time.time()*1000)
+
+def GetRunnableSuffix():
+    if SYSTEM == WINDOWS:
+        return RUNNABLE_WIN
+    elif SYSTEM == MAC:
+        return RUNNABLE_MAC
+    elif SYSTEM == LINUX:
+        return RUNNABLE_LINUX
+    return ""

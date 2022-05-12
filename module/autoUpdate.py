@@ -1,7 +1,5 @@
-import time
-
 import requests
-import os, re
+import os, re, threading
 from utils.defines import *
 from utils.UIUtils import *
 from utils.Utils import *
@@ -10,12 +8,40 @@ from module.sqlManager import SQLManager
 GIT_API_URL = "https://api.github.com/repos/%s/%s/releases/latest" % (GIT_ACCOUNT, GIT_REPO)
 
 class AutoUpdate(object):
+
+    class DownloadThread(threading.Thread):
+        def __init__(self, path, url, size, startCallback, doneCallback):
+            threading.Thread.__init__(self)
+            self.__path = path
+            self.__url = url
+            self.__size = size
+            self.__startCallback = startCallback
+            self.__doneCallback = doneCallback
+
+        def run(self) -> None:
+            try:
+                resp = requests.get(self.__url, stream=True)
+                total = int(resp.headers.get("content-length", 0))
+                if not self.__size == total:
+                    ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_NETWORK_ERROR)
+                    self.__doneCallback(False)
+                with open(self.__path, "wb") as fp:
+                    self.__startCallback()
+                    for data in resp.iter_content(chunk_size=1024):
+                        fp.write(data)
+                fp.close()
+                self.__doneCallback(True)
+
+            except:
+                ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_NETWORK_ERROR)
+                self.__doneCallback(False)
+
     def __init__(self):
         self.__db = SQLManager.get_instance()
         self.__latestReleaseInfo = {}
         size = GetWindowSize()
         self.__checkUpdateDialog = UpdateDialog((size[0] / 4, size[1] / 6), self)
-        self.__downloadDialog = DownloadDialog((size[0]/ 4, size[1]/ 8))
+        self.__downloadDialog = DownloadDialog((size[0] / 4, size[1]/ 8))
 
     def CheckUpdate(self, isForce=False):
         self.__latestReleaseInfo = requests.get(url=GIT_API_URL).json()
@@ -25,15 +51,26 @@ class AutoUpdate(object):
             self.__checkUpdateDialog.show(latestVersion)
 
     def Download(self):
-        path = JoinPath(GetAppDataDir(), TOOLS_ROOT_DIR)
-        print(path)
-        self.__downloadDialog.show()
+        name, url, size = self.__parseAssets(self.__latestReleaseInfo["assets"])
+        path = JoinPath(JoinPath(GetAppDataDir(), TOOLS_ROOT_DIR), name)
+        self.__downloadDialog.show(path, size)
+        download = self.DownloadThread(path, url, size, self.__startDownloadCallback, self.__downloadCallback)
+        download.start()
+
+    def __startDownloadCallback(self):
+        self.__downloadDialog.Start()
+
+    def __downloadCallback(self, isSuccess):
+        self.__downloadDialog.Stop(isSuccess)
+        if isSuccess:
+            print("Done")
+        else:
+            print("Error")
 
     def __checkVersion(self, version):
         v = re.findall("\d+.\d+.\d+.\d+", version)[0]
         latestVersion = v.rsplit('.')
         curVersion = VERSION.rsplit(".")
-        print(latestVersion, curVersion)
         if (latestVersion[0] > curVersion[0]) \
                 or (latestVersion[0] == curVersion[0] and latestVersion[1] > curVersion[1])\
                 or (latestVersion[0] == curVersion[0] and latestVersion[1] == curVersion[1] and latestVersion[2] > curVersion[2]) \
@@ -41,6 +78,11 @@ class AutoUpdate(object):
             return True, v
         return False, v
 
+    def __parseAssets(self, assetInfo):
+        runnableSuffix = GetRunnableSuffix()
+        for asset in assetInfo:
+            if len(re.findall(".*%s" % runnableSuffix, asset["name"])) > 0:
+                return asset["name"], asset["browser_download_url"], int(asset["size"])
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -63,6 +105,8 @@ class UpdateDialog(NoWindowDialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
         Dialog.resize(self.__size[0], self.__size[1])
+        Dialog.setMaximumSize(self.__size[0], self.__size[1])
+        Dialog.setMinimumSize(self.__size[0], self.__size[1])
         self.verticalLayoutWidget = QWidget(Dialog)
         self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
         self.verticalLayoutWidget.setGeometry(QRect(0, 0, self.__size[0], self.__size[1]))
@@ -154,18 +198,29 @@ class DownloadDialog(NoWindowDialog):
         super(DownloadDialog, self).__init__(parent)
         self.__size = size
         self.__timer = None
+        self.__path = ""
+        self.__startTime = 0
+        self.__fileSize = 0
+        self.__shouldUpdateProgress = False
         self.setupUi(self)
 
-    def show(self) -> None:
+    def show(self, path, fileSize) -> None:
         super().show()
+        self.__path = path
+        self.__fileSize = fileSize
         self.__timer = QBasicTimer()
         self.__timer.start(DOWNLOAD_TIMER_STEP, self)
 
+    def close(self) -> bool:
+        self.__reset()
+        return super(DownloadDialog, self).close()
 
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
         Dialog.resize(self.__size[0], self.__size[1])
+        Dialog.setMaximumSize(self.__size[0], self.__size[1])
+        Dialog.setMinimumSize(self.__size[0], self.__size[1])
         self.verticalLayoutWidget = QWidget(Dialog)
         self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
         self.verticalLayoutWidget.setGeometry(QRect(0, 0, self.__size[0], self.__size[1]))
@@ -179,7 +234,7 @@ class DownloadDialog(NoWindowDialog):
 
         self.progressBar = QProgressBar(self.verticalLayoutWidget)
         self.progressBar.setObjectName(u"progressBar")
-        self.progressBar.setValue(24)
+        self.progressBar.setValue(0)
 
         self.verticalLayout.addWidget(self.progressBar)
 
@@ -195,12 +250,12 @@ class DownloadDialog(NoWindowDialog):
 
         self.horizontalLayout.addWidget(self.label_download_speed)
 
-        self.label_4 = QLabel(self.verticalLayoutWidget)
-        self.label_4.setObjectName(u"label_4")
-        sizePolicy.setHeightForWidth(self.label_4.sizePolicy().hasHeightForWidth())
-        self.label_4.setSizePolicy(sizePolicy)
+        self.label_time_left = QLabel(self.verticalLayoutWidget)
+        self.label_time_left.setObjectName(u"label_time_left")
+        sizePolicy.setHeightForWidth(self.label_time_left.sizePolicy().hasHeightForWidth())
+        self.label_time_left.setSizePolicy(sizePolicy)
 
-        self.horizontalLayout.addWidget(self.label_4)
+        self.horizontalLayout.addWidget(self.label_time_left)
 
         self.verticalLayout.addLayout(self.horizontalLayout)
 
@@ -216,17 +271,70 @@ class DownloadDialog(NoWindowDialog):
             QCoreApplication.translate("Dialog", u"\u6b63\u5728\u4e0b\u8f7d\uff0c\u8bf7\u7a0d\u540e...", None))
         self.label_download_speed.setText(
             QCoreApplication.translate("Dialog", u"\u5f53\u524d\u4e0b\u8f7d\u901f\u5ea6:", None))
-        self.label_4.setText(
-            QCoreApplication.translate("Dialog", u"\u9884\u8ba1\u5269\u4f59\u65f6\u95f4\uff1a", None))
+        self.label_time_left.setText(
+            QCoreApplication.translate("Dialog", u"\u9884\u8ba1\u5269\u4f59\u65f6\u95f4:", None))
         # retranslateUi
 
+    def Start(self):
+        self.__shouldUpdateProgress = True
+        self.__startTime = time.time_ns()
+        IF_Print("start downloading: %f" % self.__startTime)
 
+    def Stop(self, isDone):
+        self.__shouldUpdateProgress = False
+        IF_Print("stop downloading.")
+        self.__resetLabels()
+        if isDone:
+            self.progressBar.setValue(100)
 
     def timerEvent(self, a0: 'QTimerEvent') -> None:
-        print(time.time(), "helloworld" )
         self.__updateProgress()
 
     def __updateProgress(self):
-        pass
+        if not self.__shouldUpdateProgress:
+            return
+        curTime = time.time_ns()
+        curSize = float(os.path.getsize(self.__path))
+        percentage = curSize / float(self.__fileSize) * 100
+        self.progressBar.setValue(percentage)
 
+        speed = curSize / ((curTime - self.__startTime) / 1000 / 1000 / 1000)
+        remain = self.__fileSize - curSize
+        remainTime = remain / speed  # in seconds
+
+        speedLabel = "%.2f byte/s" % speed
+        if speed > 1024:
+            speed = (speed / 1024)
+            speedLabel = "%.2f KB/s" % speed
+            if speed > 1024:
+                speed = speed / 1024
+                speedLabel = "%.2f MB/s" % speed
+                if speed > 1024:
+                    speed = speed / 1024
+                    speedLabel = "%.2f GB/s" % speed
+
+        h = int(remainTime / 3600)
+        min = int(remainTime / 60)
+        sec = int(remainTime - (h * 3600 + 60 * min))
+        remainTimeLabel = "%02d:%02d:%02d" % (h, min, sec)
+        self.__updateLabels(speedLabel, remainTimeLabel)
+
+    def __updateLabels(self, speedLabelText, restTimeLabelText):
+        self.label_download_speed.setText(
+            QCoreApplication.translate("Dialog", u"\u5f53\u524d\u4e0b\u8f7d\u901f\u5ea6: %s" % speedLabelText, None))
+        self.label_time_left.setText(
+            QCoreApplication.translate("Dialog", u"\u9884\u8ba1\u5269\u4f59\u65f6\u95f4: %s" % restTimeLabelText, None))
+
+    def __resetLabels(self):
+        self.label_download_speed.setText(
+            QCoreApplication.translate("Dialog", u"\u5f53\u524d\u4e0b\u8f7d\u901f\u5ea6:", None))
+        self.label_time_left.setText(
+            QCoreApplication.translate("Dialog", u"\u9884\u8ba1\u5269\u4f59\u65f6\u95f4:", None))
+
+    def __reset(self):
+        self.__startTime = 0
+        self.__fileSize = 0
+        self.__shouldUpdateProgress = False
+        self.progressBar.setValue(0)
+        self.__resetLabels()
 
