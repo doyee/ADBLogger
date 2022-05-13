@@ -70,6 +70,8 @@ class MainWindow(QMainWindow):
         self.action_general_settings.setObjectName(u"action_general_settings")
         self.action_log_level_settings = QAction(MainWindow)
         self.action_log_level_settings.setObjectName(u"action_log_level_settings")
+        self.action_check_update = QAction(MainWindow)
+        self.action_check_update.setObjectName(u"action_check_update")
         self.action_refresh_device_list = QAction(MainWindow)
         self.action_refresh_device_list.setObjectName(u"action_refresh_device_list")
         self.centralwidget = QWidget(MainWindow)
@@ -153,6 +155,8 @@ class MainWindow(QMainWindow):
         self.menubar.addAction(self.menu_device.menuAction())
         self.menu_setting.addAction(self.action_general_settings)
         self.menu_setting.addAction(self.action_log_level_settings)
+        self.menu_setting.addSeparator()
+        self.menu_setting.addAction(self.action_check_update)
         self.menu_device.addAction(self.action_refresh_device_list)
 
         # setup setting panels
@@ -190,6 +194,7 @@ class MainWindow(QMainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", TITLE_PREFIX, None))
         self.action_general_settings.setText(QCoreApplication.translate("MainWindow", u"\u901a\u7528\u8bbe\u7f6e", None))
         self.action_log_level_settings.setText(QCoreApplication.translate("MainWindow", u"\u89e3\u6790log\u7b49\u7ea7\u8bbe\u7f6e", None))
+        self.action_check_update.setText(QCoreApplication.translate("MainWindow", u"检查更新", None))
         self.action_refresh_device_list.setText(QCoreApplication.translate("MainWindow", u"\u5237\u65b0\u8bbe\u5907\u5217\u8868", None))
         self.label_device.setText(QCoreApplication.translate("MainWindow", u"\u8bbe\u5907\u5217\u8868", None))
         self.pushButton_root.setText(QCoreApplication.translate("MainWindow", u"remount", None))
@@ -205,6 +210,7 @@ class MainWindow(QMainWindow):
         # menu
         self.action_log_level_settings.triggered.connect(self.__onMenu)
         self.action_general_settings.triggered.connect(self.__onMenu)
+        self.action_check_update.triggered.connect(self.__onMenu)
         self.action_refresh_device_list.triggered.connect(self.__onMenu)
 
         self.device_changed.connect(self.__onUSBStateChanged)
@@ -216,6 +222,8 @@ class MainWindow(QMainWindow):
             self.__parserDialog.show()
         elif self.sender() == self.action_general_settings:
             self.__generalSettingDialog.show()
+        elif self.sender() == self.action_check_update:
+            pass
         elif self.sender() == self.action_refresh_device_list:
             self.__updateDevice()
 

@@ -66,7 +66,6 @@ class AutoUpdate(QObject):
         size = GetWindowSize()
         self.__checkUpdateDialog = UpdateDialog((size[0] / 4, size[1] / 6), self)
 
-
     def CheckUpdate(self, isForce=False):
         self.__latestReleaseInfo = requests.get(url=GIT_API_URL).json()
         latestVersion = self.__latestReleaseInfo["tag_name"]
