@@ -1,15 +1,10 @@
-import time
-import traceback
-
 import requests
-import os, re, threading
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from ui.noWindowHintDialog import NoWindowDialog
 
-from utils.defines import *
 from utils.UIUtils import *
 from utils.Utils import *
 
@@ -65,13 +60,13 @@ class AutoUpdate(QObject):
         self.__latestReleaseInfo = {}
         size = GetWindowSize()
         self.__checkUpdateDialog = UpdateDialog((size[0] / 4, size[1] / 6), self)
-        self.__listener = listener
 
     def CheckUpdate(self, isForce=False):
+
         self.__latestReleaseInfo = requests.get(url=GIT_API_URL).json()
         latestVersion = self.__latestReleaseInfo["tag_name"]
         isUpdate, latestVersion = self.__checkVersion(latestVersion)
-        self.__listener.onCheckUpdate(isUpdate, latestVersion)
+        return isUpdate, latestVersion
 
     def Download(self):
         name, url, size = self.__parseAssets(self.__latestReleaseInfo["assets"])
@@ -109,6 +104,7 @@ class UpdateDialog(NoWindowDialog):
         self.__downloadDialog = DownloadDialog((displaySize[0] / 4, displaySize[1] / 8))
         self.__size = (displaySize[0] / 4, displaySize[1] / 6)
         self.__module = module
+        self.__isForce = False
 
     def show(self, latestVersion) -> None:
         self.__latestVersion = latestVersion
@@ -152,6 +148,7 @@ class UpdateDialog(NoWindowDialog):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.checkBox_ignoreVersion = QCheckBox(self.verticalLayoutWidget)
         self.checkBox_ignoreVersion.setObjectName(u"checkBox_ignoreVersion")
+        self.checkBox_ignoreVersion.setHidden(self.__isForce)
 
         self.horizontalLayout.addWidget(self.checkBox_ignoreVersion)
 
@@ -204,6 +201,9 @@ class UpdateDialog(NoWindowDialog):
         self.pushButton_update.setText(QCoreApplication.translate("Dialog", u"\u7acb\u5373\u66f4\u65b0", None))
 
     # retranslateUi
+
+    def SetIsForce(self, isForce):
+        self.__isForce = isForce
 
     def __ignore(self):
         self.close()

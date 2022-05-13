@@ -19,12 +19,23 @@ from module.pullModule import PullModule
 from module.logLevelParser import LogLevelParser
 from module.generalSetings import GeneralSettings
 from module.autoUpdate import AutoUpdate, UpdateDialog
-from controller.autoUpdateListener import AutoUpdateListener
 from utils.Utils import *
 
 TITLE_PREFIX = "adb logcat tool"
 
-class MainWindow(QMainWindow, AutoUpdateListener):
+
+class AutoUpdateThread(QThread):
+    versionChecked = pyqtSignal(bool, str)
+
+    def __init__(self, module, parent=None):
+        super().__init__(parent)
+        self.__module = module
+
+    def run(self) -> None:
+        hasNewVersion, latestVersion = self.__module.CheckUpdate(False)
+        self.versionChecked.emit(hasNewVersion, latestVersion)
+
+class MainWindow(QMainWindow):
 
     class DeviceThread(threading.Thread):
         def __init__(self, adbManager, comboBox, callback, delay):
@@ -52,11 +63,13 @@ class MainWindow(QMainWindow, AutoUpdateListener):
     device_changed = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
+        self.__isChecking = False
         QWidget.__init__(self, parent)
         self.__adbManager = ADBManager.get_instance()
         self.__deviceInfo = []
         self.__displaySize = GetWindowSize()
         self.__autoUpdateModule = AutoUpdate(self)
+        self.__updateThread = AutoUpdateThread(self.__autoUpdateModule)
         self.setupUi(self, (self.__displaySize[0] / 3, self.__displaySize[1] * 3 / 5))
 
     def setupUi(self, MainWindow, windowSize):
@@ -216,6 +229,8 @@ class MainWindow(QMainWindow, AutoUpdateListener):
         self.action_check_update.triggered.connect(self.__onMenu)
         self.action_refresh_device_list.triggered.connect(self.__onMenu)
 
+        self.__updateThread.versionChecked.connect(self.__onCheckUpdate)
+
         self.device_changed.connect(self.__onUSBStateChanged)
 
         self.pushButton_root.clicked.connect(self.__onRemount)
@@ -225,8 +240,10 @@ class MainWindow(QMainWindow, AutoUpdateListener):
             self.__parserDialog.show()
         elif self.sender() == self.action_general_settings:
             self.__generalSettingDialog.show()
-        elif self.sender() == self.action_check_update:
-            self.__autoUpdateModule.CheckUpdate(True)
+        elif (self.sender() == self.action_check_update) and (not self.__isChecking):
+            self.__isChecking = True
+            self.__autoUpdateDialog.SetIsForce(True)
+            self.__updateThread.start()
         elif self.sender() == self.action_refresh_device_list:
             self.__updateDevice()
 
@@ -270,6 +287,7 @@ class MainWindow(QMainWindow, AutoUpdateListener):
 
         return retval, result
 
-    def onCheckUpdate(self, hasNewVersion, latestVersion):
+    def __onCheckUpdate(self, hasNewVersion, latestVersion):
         if hasNewVersion:
             self.__autoUpdateDialog.show(latestVersion)
+        self.__isChecking = False
