@@ -2,7 +2,6 @@ from PyQt5.QtGui import QColor
 
 DEBUG = False
 DEBUG_PRINT = True
-IS_BETA = True
 
 # ERROR CODE
 ERROR_CODE_BASE = 0
@@ -60,9 +59,9 @@ RUNNABLE_MAC = ".dmg"
 RUNNABLE_LINUX = ".deb"
 
 UI_VERSION = "1.0.0.0"
-MODULE_VERSION = "1.0.0.2"
+MODULE_VERSION = "1.0.0.3"
 DB_VERSION = 1
-VERSION = "1.0.0.1"
+VERSION = "1.0.0.3"
 
 DEVICE_INFO_ID = "deviceId"
 DEVICE_INFO_NAME = "deviceName"
