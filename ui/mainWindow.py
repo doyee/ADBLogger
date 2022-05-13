@@ -206,6 +206,10 @@ class MainWindow(QMainWindow):
         if isFirstTime:
             self.__parserDialog.show()
 
+        self.__isChecking = True
+        self.__autoUpdateDialog.SetIsForce(False)
+        self.__updateThread.start()
+
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", TITLE_PREFIX, None))
         self.action_general_settings.setText(QCoreApplication.translate("MainWindow", u"\u901a\u7528\u8bbe\u7f6e", None))

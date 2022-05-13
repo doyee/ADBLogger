@@ -105,10 +105,14 @@ class UpdateDialog(NoWindowDialog):
         self.__size = (displaySize[0] / 4, displaySize[1] / 6)
         self.__module = module
         self.__isForce = False
+        self.setupUi(self)
 
     def show(self, latestVersion) -> None:
         self.__latestVersion = latestVersion
-        self.setupUi(self)
+        self.label_latestVersion.setText(QCoreApplication.translate("Dialog",
+                                                                    u"\u6700\u65b0\u53ef\u66f4\u65b0\u7248\u672c\uff1a%s" % self.__latestVersion,
+                                                                    None))
+        self.checkBox_ignoreVersion.setHidden(self.__isForce)
         super().show()
 
 
@@ -148,7 +152,6 @@ class UpdateDialog(NoWindowDialog):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.checkBox_ignoreVersion = QCheckBox(self.verticalLayoutWidget)
         self.checkBox_ignoreVersion.setObjectName(u"checkBox_ignoreVersion")
-        self.checkBox_ignoreVersion.setHidden(self.__isForce)
 
         self.horizontalLayout.addWidget(self.checkBox_ignoreVersion)
 
@@ -190,9 +193,6 @@ class UpdateDialog(NoWindowDialog):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"在线更新", None))
         self.label_title.setText(QCoreApplication.translate("Dialog", u"\u53d1\u73b0\u65b0\u7248\u672c\uff01", None))
-        self.label_latestVersion.setText(QCoreApplication.translate("Dialog",
-                                                                    u"\u6700\u65b0\u53ef\u66f4\u65b0\u7248\u672c\uff1a%s" % self.__latestVersion,
-                                                                    None))
         self.label_curVersion.setText(
             QCoreApplication.translate("Dialog", u"\u5f53\u524d\u7248\u672c\uff1a%s" % VERSION, None))
         self.checkBox_ignoreVersion.setText(
