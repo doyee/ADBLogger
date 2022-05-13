@@ -1,10 +1,12 @@
 import os.path
 
+import module
 from utils.Utils import *
 from utils.defines import *
 import sqlite3
 import threading, time
 from module.table import *
+
 
 def IsDbExist(path):
     return os.path.exists(path)
@@ -33,6 +35,7 @@ class SQLManager(object):
     def __init__(self):
         path = os.path.join(os.path.join(GetAppDataDir(), TOOLS_ROOT_DIR), TOOLS_DB_MANE)
         self.__db = sqlite3.connect(path)
+        self.__checkDBUpdates()
 
     @classmethod
     def get_instance(cls):
@@ -78,8 +81,8 @@ class SQLManager(object):
             self.__db.cursor().execute(query)
             self.__db.commit()
             return ERROR_CODE_SUCCESS
-        except:
-            print("insertion error: %s" % query)
+        except Exception as e:
+            print("insertion error: %s\n%s" % (query, e))
             return ERROR_CODE_DB_INSERT_FAILED
 
     def Select(self, info:QueryInfo):
@@ -113,3 +116,44 @@ class SQLManager(object):
            self.__db.commit()
         except:
             print("cannot do query %s" % query)
+
+    def __checkDBUpdates(self):
+        query = """SELECT count(*) FROM sqlite_master WHERE type='table' AND name='%s';""" % settingTable.Table
+        count = self.__db.execute(query).fetchall()[0][0]
+        if count == 0:
+            return
+        info = self.QueryInfo()
+        info.Table = settingTable.Table
+        info.Columns = [settingTable.Value]
+        info.Conditions = "%s='%s'" % (settingTable.Name, module.settingDefines.SETTING_DB_VERSION)
+        result = self.Select(info).fetchall()
+        if len(result) == 0:
+            querys = ["""PRAGMA foreign_keys = 0;""",
+                      """CREATE TABLE sqlitestudio_temp_table AS SELECT * FROM SettingTable;""",
+                      """DROP TABLE SettingTable;""",
+                      """CREATE TABLE SettingTable (id INTEGER PRIMARY KEY NOT NULL, settingName TEXT NOT NULL, settingValue TEXT NOT NULL, settingType TEXT NOT NULL);""",
+                      """INSERT INTO SettingTable (id, settingName, settingValue, settingType) SELECT id, settingName, settingValue, settingType FROM sqlitestudio_temp_table;""",
+                      """DROP TABLE sqlitestudio_temp_table;""",
+                      """PRAGMA foreign_keys = 1;"""]
+            for q in querys:
+                self.__db.execute(q)
+            self.__db.commit()
+
+            newInsert = [module.settingDefines.SETTING_DB_VERSION,
+                         module.settingDefines.SETTING_IS_IGNORE_LATEST_UPDATE,
+                         module.settingDefines.SETTING_LATEST_IGNORED_VERSION]
+            for name in newInsert:
+                insert = self.InsertInfo()
+                insert.Table = settingTable.Table
+                insert.Headers = settingTable.Headers[1:]
+                insert.Values = [name, module.settingDefines.RUNTIME_SETTINGS_DEFAULT[name][0], module.settingDefines.RUNTIME_SETTINGS_DEFAULT[name][1]]
+                insert.isChar = [True, True, True]
+                self.Insert(insert)
+
+        else:
+            dbVersion = result[0][0]
+            IF_Print("dbVersion:", dbVersion)
+            # TO-DO: update tables in db as well as db version
+
+
+

@@ -44,6 +44,6 @@ class settingTable(table):
     Headers = [ID, Name, Value, Type]
 
     def create(self):
-        return """CREATE TABLE %s (%s INT PRIMARY KEY NOT NULL, %s TEXT NOT NULL, %s TEXT NOT NULL, %s TEXT NOT NULL);""" % (self.Table, self.ID, self.Name, self.Value, self.Type)
+        return """CREATE TABLE %s (%s INTEGER PRIMARY KEY NOT NULL, %s TEXT NOT NULL, %s TEXT NOT NULL, %s TEXT NOT NULL);""" % (self.Table, self.ID, self.Name, self.Value, self.Type)
 
 tables = [settingTable()]

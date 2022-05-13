@@ -104,11 +104,10 @@ class AutoUpdate(QObject):
 
 class UpdateDialog(NoWindowDialog):
 
-    def __init__(self, size, module, parent=None):
+    def __init__(self, displaySize, module, parent=None):
         super(UpdateDialog, self).__init__(parent)
-        windowSize = GetWindowSize()
-        self.__downloadDialog = DownloadDialog((windowSize[0] / 4, windowSize[1] / 8))
-        self.__size = size
+        self.__downloadDialog = DownloadDialog((displaySize[0] / 4, displaySize[1] / 8))
+        self.__size = (displaySize[0] / 4, displaySize[1] / 6)
         self.__module = module
 
     def show(self, latestVersion) -> None:
@@ -189,6 +188,7 @@ class UpdateDialog(NoWindowDialog):
     def __connectUI(self):
         self.pushButton_ignore.clicked.connect(self.__ignore)
         self.pushButton_update.clicked.connect(self.__update)
+        self.checkBox_ignoreVersion.clicked.connect(self.__checkIgnore)
 
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"在线更新", None))
@@ -216,6 +216,10 @@ class UpdateDialog(NoWindowDialog):
         download.start()
         self.close()
         self.__downloadDialog.show(path, size)
+
+    def __checkIgnore(self, checked):
+        self.pushButton_update.setEnabled(not checked)
+
 
     def __onDownloadStart(self):
         self.__downloadDialog.Start()

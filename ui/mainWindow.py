@@ -171,7 +171,7 @@ class MainWindow(QMainWindow, AutoUpdateListener):
         self.__generalSettingDialog = GeneralSettingPanel(self, generalSettingPanelSize, settingModule)
         self.__generalSettingDialog.setupUi()
         self.__generalSettingDialog.setWindowModality(Qt.ApplicationModal)
-        self.__autoUpdateDialog = UpdateDialog((self.__displaySize[0] / 4, self.__displaySize[1] / 6), self.__autoUpdateModule)
+        self.__autoUpdateDialog = UpdateDialog(self.__displaySize, self.__autoUpdateModule)
 
         self.retranslateUi(MainWindow)
         self.__connectUi()
