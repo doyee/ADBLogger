@@ -30,9 +30,13 @@ class AutoUpdateThread(QThread):
     def __init__(self, module, parent=None):
         super().__init__(parent)
         self.__module = module
+        self.__isForce = False
+
+    def SetIsForce(self, isForce):
+        self.__isForce = isForce
 
     def run(self) -> None:
-        hasNewVersion, latestVersion = self.__module.CheckUpdate(False)
+        hasNewVersion, latestVersion = self.__module.CheckUpdate(self.__isForce)
         self.versionChecked.emit(hasNewVersion, latestVersion)
 
 class MainWindow(QMainWindow):
@@ -247,6 +251,7 @@ class MainWindow(QMainWindow):
         elif (self.sender() == self.action_check_update) and (not self.__isChecking):
             self.__isChecking = True
             self.__autoUpdateDialog.SetIsForce(True)
+            self.__updateThread.SetIsForce(True)
             self.__updateThread.start()
         elif self.sender() == self.action_refresh_device_list:
             self.__updateDevice()

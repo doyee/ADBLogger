@@ -34,7 +34,7 @@ class SQLManager(object):
 
     def __init__(self):
         path = os.path.join(os.path.join(GetAppDataDir(), TOOLS_ROOT_DIR), TOOLS_DB_MANE)
-        self.__db = sqlite3.connect(path)
+        self.__db = sqlite3.connect(path, check_same_thread=False)
         self.__checkDBUpdates()
 
     @classmethod
@@ -101,8 +101,8 @@ class SQLManager(object):
         try:
             cursor = self.__db.cursor().execute(query)
             return cursor
-        except:
-            print("cannot do query %s" % query)
+        except Exception as e:
+            print("cannot do query %s \n%s" % (query, e))
             return None
 
     def Update(self, info:UpdateInfo):
@@ -151,7 +151,7 @@ class SQLManager(object):
                 self.Insert(insert)
 
         else:
-            dbVersion = result[0][0]
+            dbVersion = int(result[0][0])
             IF_Print("dbVersion:", dbVersion)
             # TO-DO: update tables in db as well as db version
 

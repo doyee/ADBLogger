@@ -1,4 +1,4 @@
-import requests
+import requests, module
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -9,6 +9,7 @@ from utils.UIUtils import *
 from utils.Utils import *
 
 from module.sqlManager import SQLManager
+from module.table import settingTable
 
 TIMEOUT = 20 # sec
 GIT_API_URL = "https://api.github.com/repos/%s/%s/releases/latest" % (GIT_ACCOUNT, GIT_REPO)
@@ -62,10 +63,9 @@ class AutoUpdate(QObject):
         self.__checkUpdateDialog = UpdateDialog((size[0] / 4, size[1] / 6), self)
 
     def CheckUpdate(self, isForce=False):
-
         self.__latestReleaseInfo = requests.get(url=GIT_API_URL).json()
         latestVersion = self.__latestReleaseInfo["tag_name"]
-        isUpdate, latestVersion = self.__checkVersion(latestVersion)
+        isUpdate, latestVersion = self.__checkVersion(latestVersion, isForce)
         return isUpdate, latestVersion
 
     def Download(self):
@@ -77,16 +77,44 @@ class AutoUpdate(QObject):
         IF_Print("Start to Install")
         pass
 
-    def __checkVersion(self, version):
+    def IgnoreViersion(self, version):
+        queryInfo = SQLManager.UpdateInfo()
+        queryInfo.Table = settingTable.Table
+        queryInfo.Columns = [settingTable.Value]
+        queryInfo.Values = [True]
+        queryInfo.isChar = [True]
+        queryInfo.Conditions = "%s='%s'" % (settingTable.Name, module.settingDefines.SETTING_IS_IGNORE_LATEST_UPDATE)
+        self.__db.Update(queryInfo)
+        queryInfo.Values = [version]
+        queryInfo.Conditions = "%s='%s'" % (settingTable.Name, module.settingDefines.SETTING_LATEST_IGNORED_VERSION)
+        self.__db.Update(queryInfo)
+
+    def __checkVersion(self, version, isForce):
         v = re.findall("\d+.\d+.\d+.\d+", version)[0]
         latestVersion = v.rsplit('.')
         curVersion = VERSION.rsplit(".")
+
+        queryInfo = SQLManager.QueryInfo()
+        queryInfo.Table = settingTable.Table
+        queryInfo.Columns = [settingTable.Value]
+        queryInfo.Conditions = "%s='%s'" % (settingTable.Name, module.settingDefines.SETTING_IS_IGNORE_LATEST_UPDATE)
+        result = self.__db.Select(queryInfo).fetchall()[0][0]
+        if result == "True":
+            queryInfo.Conditions = "%s='%s'" % (
+            settingTable.Name, module.settingDefines.SETTING_LATEST_IGNORED_VERSION)
+            ignoredVersion = self.__db.Select(queryInfo).fetchall()[0][0]
+            if ignoredVersion == v:
+                if isForce:
+                    return True, v
+                return False, v
+
         if (latestVersion[0] > curVersion[0]) \
                 or (latestVersion[0] == curVersion[0] and latestVersion[1] > curVersion[1]) \
                 or (latestVersion[0] == curVersion[0] and latestVersion[1] == curVersion[1] and latestVersion[2] >
                     curVersion[2]) \
                 or (latestVersion[0] == curVersion[0] and latestVersion[1] == curVersion[1] and latestVersion[2] ==
                     curVersion[2] and latestVersion[3] > curVersion[3]):
+
             return True, v
         return False, v
 
@@ -206,6 +234,8 @@ class UpdateDialog(NoWindowDialog):
         self.__isForce = isForce
 
     def __ignore(self):
+        if self.checkBox_ignoreVersion.isChecked():
+            self.__module.IgnoreViersion(self.__latestVersion)
         self.close()
 
     def __update(self):
@@ -219,7 +249,6 @@ class UpdateDialog(NoWindowDialog):
 
     def __checkIgnore(self, checked):
         self.pushButton_update.setEnabled(not checked)
-
 
     def __onDownloadStart(self):
         self.__downloadDialog.Start()
