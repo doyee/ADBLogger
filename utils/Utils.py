@@ -9,7 +9,7 @@ def IF_Print(*args, sep=' ', end='\n', file=None):
         print(*args, sep=' ', end='\n', file=None)
 
 def GetVersionStr():
-    return "Version[UI:%s  Mod:%s  db:%d]" % (UI_VERSION, MODULE_VERSION, DB_VERSION)
+    return "当前版本[UI:%s  Mod:%s  db:%d]" % (UI_VERSION, MODULE_VERSION, DB_VERSION)
 
 def StartDir(dir):
     os.startfile(dir)

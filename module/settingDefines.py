@@ -10,7 +10,6 @@ SETTING_LAST_DEST_DIR = "LastDest"
 SETTING_LAST_SRC_DIR = "LastSrc"
 SETTING_LAST_ADB_PULL_SAVE_DIR = "LastPullSave"
 SETTING_DB_VERSION = "dbVersion"
-SETTING_IS_IGNORE_LATEST_UPDATE = "IgnoreLatest"
 SETTING_LATEST_IGNORED_VERSION = "LatestIgnored"
 
 GENERAL_SETTINGS_DEFAULT = {SETTING_OPEN_FILE: (False, settingTable.Type_Bool),
@@ -21,7 +20,6 @@ RUNTIME_SETTINGS_DEFAULT = {SETTING_LAST_DEST_DIR: (GetDesktop(), settingTable.T
                             SETTING_LAST_SRC_DIR: (GetDesktop(), settingTable.Type_Str),
                             SETTING_LAST_ADB_PULL_SAVE_DIR: (GetDesktop(), settingTable.Type_Str),
                             SETTING_DB_VERSION: (DB_VERSION, settingTable.Type_Int),
-                            SETTING_IS_IGNORE_LATEST_UPDATE: (False, settingTable.Type_Bool),
                             SETTING_LATEST_IGNORED_VERSION: ("", settingTable.Type_Str)}
 
 

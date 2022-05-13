@@ -1,3 +1,5 @@
+import sys
+
 import requests, module
 
 from PyQt5.QtCore import *
@@ -17,7 +19,7 @@ GIT_API_URL = "https://api.github.com/repos/%s/%s/releases/latest" % (GIT_ACCOUN
 
 class DownloadThread(QThread):
     downloadStart = pyqtSignal()
-    downloadDone = pyqtSignal(bool)
+    downloadDone = pyqtSignal(bool, str)
 
     def __init__(self, path, url, size, parent=None):
         super().__init__(parent)
@@ -31,7 +33,7 @@ class DownloadThread(QThread):
             total = int(resp.headers.get("content-length", 0))
             if not self.__size == total:
                 IF_Print("network error: size not match [total:%d - content:%d]" % (self.__size, total))
-                self.downloadDone.emit(False)
+                self.downloadDone.emit(False, "")
                 return
             IF_Print("\nStart Download at %s" % self.__url)
 
@@ -43,15 +45,15 @@ class DownloadThread(QThread):
                         fp.write(data)
                     except Exception as e:
                         IF_Print("\nwriting failed: %s %s" % (self.__path, e))
-                        self.downloadDone.emit(False)
+                        self.downloadDone.emit(False, "")
 
                 fp.close()
-                self.downloadDone.emit(True)
+                self.downloadDone.emit(True, self.__path)
 
 
         except:
             IF_Print("\nnetwork error: cannot GET from %s Timeout: %d sec" % (self.__url, TIMEOUT))
-            self.downloadDone.emit(False)
+            self.downloadDone.emit(False, "")
 
 class AutoUpdate(QObject):
 
@@ -73,19 +75,17 @@ class AutoUpdate(QObject):
         path = JoinPath(JoinPath(GetAppDataDir(), TOOLS_ROOT_DIR), name)
         return path, url, size
 
-    def Install(self):
-        IF_Print("Start to Install")
-        pass
+    def Install(self, path):
+        IF_Print("Start to Install", path)
+        os.popen("start %s " % path)
+        sys.exit(0)
 
     def IgnoreViersion(self, version):
         queryInfo = SQLManager.UpdateInfo()
         queryInfo.Table = settingTable.Table
         queryInfo.Columns = [settingTable.Value]
-        queryInfo.Values = [True]
-        queryInfo.isChar = [True]
-        queryInfo.Conditions = "%s='%s'" % (settingTable.Name, module.settingDefines.SETTING_IS_IGNORE_LATEST_UPDATE)
-        self.__db.Update(queryInfo)
         queryInfo.Values = [version]
+        queryInfo.isChar = [True]
         queryInfo.Conditions = "%s='%s'" % (settingTable.Name, module.settingDefines.SETTING_LATEST_IGNORED_VERSION)
         self.__db.Update(queryInfo)
 
@@ -97,16 +97,14 @@ class AutoUpdate(QObject):
         queryInfo = SQLManager.QueryInfo()
         queryInfo.Table = settingTable.Table
         queryInfo.Columns = [settingTable.Value]
-        queryInfo.Conditions = "%s='%s'" % (settingTable.Name, module.settingDefines.SETTING_IS_IGNORE_LATEST_UPDATE)
+        queryInfo.Conditions = "%s='%s'" % (settingTable.Name, module.settingDefines.SETTING_LATEST_IGNORED_VERSION)
         result = self.__db.Select(queryInfo).fetchall()[0][0]
-        if result == "True":
-            queryInfo.Conditions = "%s='%s'" % (
-            settingTable.Name, module.settingDefines.SETTING_LATEST_IGNORED_VERSION)
-            ignoredVersion = self.__db.Select(queryInfo).fetchall()[0][0]
-            if ignoredVersion == v:
-                if isForce:
-                    return True, v
-                return False, v
+
+        ignoredVersion = self.__db.Select(queryInfo).fetchall()[0][0]
+        if ignoredVersion == v:
+            if isForce:
+                return True, v
+            return False, v
 
         if (latestVersion[0] > curVersion[0]) \
                 or (latestVersion[0] == curVersion[0] and latestVersion[1] > curVersion[1]) \
@@ -253,12 +251,12 @@ class UpdateDialog(NoWindowDialog):
     def __onDownloadStart(self):
         self.__downloadDialog.Start()
 
-    def __onDownloadDone(self, isSuccess):
+    def __onDownloadDone(self, isSuccess, path):
         self.__downloadDialog.Stop(isSuccess)
         if isSuccess:
             ShowMessageDialog(MESSAGE_TYPE_INFO, MESSAGE_STR_DOWNLOAD_DONE_AND_INSTALL)
-            self.__module.Install()
             self.__downloadDialog.close()
+            self.__module.Install(path)
         else:
             ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_NETWORK_ERROR)
             self.__downloadDialog.close()

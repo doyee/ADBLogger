@@ -300,3 +300,4 @@ class MainWindow(QMainWindow):
         if hasNewVersion:
             self.__autoUpdateDialog.show(latestVersion)
         self.__isChecking = False
+        self.statusbar.addWidget(QLabel("最新版本:%s" % latestVersion), 1)
