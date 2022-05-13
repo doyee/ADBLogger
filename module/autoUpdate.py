@@ -60,18 +60,18 @@ class DownloadThread(QThread):
 class AutoUpdate(QObject):
 
 
-    def __init__(self):
+    def __init__(self, listener):
         self.__db = SQLManager.get_instance()
         self.__latestReleaseInfo = {}
         size = GetWindowSize()
         self.__checkUpdateDialog = UpdateDialog((size[0] / 4, size[1] / 6), self)
+        self.__listener = listener
 
     def CheckUpdate(self, isForce=False):
         self.__latestReleaseInfo = requests.get(url=GIT_API_URL).json()
         latestVersion = self.__latestReleaseInfo["tag_name"]
         isUpdate, latestVersion = self.__checkVersion(latestVersion)
-        if (isUpdate):
-            self.__checkUpdateDialog.show(latestVersion)
+        self.__listener.onCheckUpdate(isUpdate, latestVersion)
 
     def Download(self):
         name, url, size = self.__parseAssets(self.__latestReleaseInfo["assets"])

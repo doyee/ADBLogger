@@ -1,5 +1,4 @@
 import threading
-import traceback
 from ctypes import wintypes
 from time import sleep
 
@@ -19,11 +18,13 @@ from module.levelModule import LevelModule
 from module.pullModule import PullModule
 from module.logLevelParser import LogLevelParser
 from module.generalSetings import GeneralSettings
+from module.autoUpdate import AutoUpdate, UpdateDialog
+from controller.autoUpdateListener import AutoUpdateListener
 from utils.Utils import *
 
 TITLE_PREFIX = "adb logcat tool"
 
-class MainWindow(QMainWindow):
+class MainWindow(QMainWindow, AutoUpdateListener):
 
     class DeviceThread(threading.Thread):
         def __init__(self, adbManager, comboBox, callback, delay):
@@ -54,8 +55,9 @@ class MainWindow(QMainWindow):
         QWidget.__init__(self, parent)
         self.__adbManager = ADBManager.get_instance()
         self.__deviceInfo = []
-        displaySize = GetWindowSize()
-        self.setupUi(self, (displaySize[0] / 3, displaySize[1] * 3 / 5))
+        self.__displaySize = GetWindowSize()
+        self.__autoUpdateModule = AutoUpdate(self)
+        self.setupUi(self, (self.__displaySize[0] / 3, self.__displaySize[1] * 3 / 5))
 
     def setupUi(self, MainWindow, windowSize):
         if not MainWindow.objectName():
@@ -169,6 +171,7 @@ class MainWindow(QMainWindow):
         self.__generalSettingDialog = GeneralSettingPanel(self, generalSettingPanelSize, settingModule)
         self.__generalSettingDialog.setupUi()
         self.__generalSettingDialog.setWindowModality(Qt.ApplicationModal)
+        self.__autoUpdateDialog = UpdateDialog((self.__displaySize[0] / 4, self.__displaySize[1] / 6), self.__autoUpdateModule)
 
         self.retranslateUi(MainWindow)
         self.__connectUi()
@@ -223,7 +226,7 @@ class MainWindow(QMainWindow):
         elif self.sender() == self.action_general_settings:
             self.__generalSettingDialog.show()
         elif self.sender() == self.action_check_update:
-            pass
+            self.__autoUpdateModule.CheckUpdate(True)
         elif self.sender() == self.action_refresh_device_list:
             self.__updateDevice()
 
@@ -266,3 +269,7 @@ class MainWindow(QMainWindow):
                 self.device_changed.emit()
 
         return retval, result
+
+    def onCheckUpdate(self, hasNewVersion, latestVersion):
+        if hasNewVersion:
+            self.__autoUpdateDialog.show(latestVersion)
