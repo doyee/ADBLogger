@@ -65,10 +65,14 @@ class AutoUpdate(QObject):
         self.__checkUpdateDialog = UpdateDialog((size[0] / 4, size[1] / 6), self)
 
     def CheckUpdate(self, isForce=False):
-        self.__latestReleaseInfo = requests.get(url=GIT_API_URL).json()
-        latestVersion = self.__latestReleaseInfo["tag_name"]
-        isUpdate, latestVersion = self.__checkVersion(latestVersion, isForce)
-        return isUpdate, latestVersion
+        try:
+            self.__latestReleaseInfo = requests.get(url=GIT_API_URL).json()
+            latestVersion = self.__latestReleaseInfo["tag_name"]
+            isUpdate, latestVersion = self.__checkVersion(latestVersion, isForce)
+            return isUpdate, latestVersion
+        except:
+            IF_Print("network error: cannot request %s" % GIT_API_URL)
+            return False, VERSION
 
     def Download(self):
         name, url, size = self.__parseAssets(self.__latestReleaseInfo["assets"])
