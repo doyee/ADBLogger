@@ -168,6 +168,9 @@ class MainWindow(QMainWindow):
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         self.statusbar.addWidget(QLabel(GetVersionStr()), 1)
+        self.__latestVersion = QLabel("")
+        self.__latestVersion.setObjectName(u"LatestLabel")
+        self.statusbar.addWidget(self.__latestVersion, 1)
         MainWindow.setStatusBar(self.statusbar)
 
         self.menubar.addAction(self.menu_setting.menuAction())
@@ -300,4 +303,4 @@ class MainWindow(QMainWindow):
         if hasNewVersion:
             self.__autoUpdateDialog.show(latestVersion)
         self.__isChecking = False
-        self.statusbar.addWidget(QLabel("最新版本:%s" % latestVersion), 1)
+        self.__latestVersion.setText("最新版本:%s" % latestVersion)
