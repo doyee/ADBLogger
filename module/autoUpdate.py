@@ -102,7 +102,6 @@ class AutoUpdate(QObject):
         queryInfo.Table = settingTable.Table
         queryInfo.Columns = [settingTable.Value]
         queryInfo.Conditions = "%s='%s'" % (settingTable.Name, module.settingDefines.SETTING_LATEST_IGNORED_VERSION)
-        result = self.__db.Select(queryInfo).fetchall()[0][0]
 
         ignoredVersion = self.__db.Select(queryInfo).fetchall()[0][0]
         if ignoredVersion == v:
