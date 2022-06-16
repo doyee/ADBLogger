@@ -5,7 +5,7 @@ import requests, module
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from ui.noWindowHintDialog import NoWindowDialog
+from uilogic.noWindowHintDialog import NoWindowDialog
 
 from utils.UIUtils import *
 from utils.Utils import *
