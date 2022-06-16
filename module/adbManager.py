@@ -8,6 +8,7 @@ class ADBManager(object):
     def __init__(self):
         self.__adbPath = ""
         self.__deviceInfo = []
+
         self.__selectedDevice = -1
         pass
 
@@ -48,7 +49,7 @@ class ADBManager(object):
 
         if res.count("production builds") > 0:
             return ERROR_CODE_PRODUCTION_DEVICE
-        elif not res == "":
+        elif (res.__len__() > 0) and (res.count("already running as root") == 0):
             return ERROR_CODE_UNKNOWN
 
         cmd = "%s -s %s remount" % (self.__adbPath, self.GetSelectedDeviceId())
@@ -59,6 +60,21 @@ class ADBManager(object):
             return ERROR_CODE_REMOUNT_FAILED
         else:
             return ERROR_CODE_SUCCESS
+
+    def KillCameraServer(self):
+        if self.__selectedDevice == -1:
+            return ERROR_CODE_NO_DEVICE
+        cmd = "%s -s %s root" % (self.__adbPath, self.GetSelectedDeviceId())
+        IF_Print("cmd: %s" % cmd)
+        res = RunCmdAndReturn(cmd)
+        IF_Print("RunCmdAndReturn: %s" % res)
+        kill_cmd = "kill $( ps -e | grep -ie 'camera' | awk '{print $2}')"
+        cmd = "%s wait-for-device shell \"%s\"  " % (self.__adbPath, kill_cmd)
+        IF_Print("cmd: %s" % cmd)
+        res = RunCmdAndReturn(cmd)
+        IF_Print("cmd: %s" % res)
+        return ERROR_CODE_SUCCESS
+
 
     def Mkdir(self, dir):
         if self.__selectedDevice == -1:
@@ -79,7 +95,7 @@ class ADBManager(object):
         IF_Print("cmd: %s" % cmd)
         result = RunCmdAndReturn(cmd)
         IF_Print(result)
-        if result.count("not exist") > 0:
+        if (result.count("not exist") > 0) or (result.count("No such file or directory") > 0):
             return ERROR_CODE_ADB_PULL_NOT_EXIST
         elif result.count("adb: error:") > 0:
             return ERROR_CODE_ADB_PULL_FAILED

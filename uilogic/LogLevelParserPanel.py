@@ -1,7 +1,8 @@
 from PyQt5.QtCore import QCoreApplication, Qt
-from PyQt5.QtWidgets import QPlainTextEdit
+from PyQt5.QtWidgets import QPlainTextEdit, QDialog
 
-from ui.settingDialog import SettingDialog
+from ui.LogLevelParserPanel import Ui_LogLevelParserPanel as UILLPP
+from uilogic.noWindowHintDialog import NoWindowDialog
 from utils.UIUtils import *
 
 PLACE_HOLDER_TEXT = \
@@ -19,37 +20,35 @@ static const CamxLogGroup CamxLogGroupPProc2        = CamxLogGroupPProc         
 """
 
 
-class LogLevelParsePanel(SettingDialog):
+class LogLevelParserPanel(NoWindowDialog, UILLPP):
 
-    def __init__(self, parent, size, module):
-        super().__init__(parent, size)
-        self.__parent = parent
-        self.setWindowFlags(Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.Dialog)
+    def __init__(self, module):
+        super().__init__()
         self.__module = module
 
-    def setupUi(self):
-        self.__plainTextEdit_parser = QPlainTextEdit(self)
-        self.__plainTextEdit_parser.setObjectName(u"plainTextEdit_parser")
+    def buildUp(self):
+        self.__setupUi()
+        self.__connectUi()
 
-        self._verticalLayout_main.addWidget(self.__plainTextEdit_parser)
+    def __setupUi(self):
+        self.setupUi(self)
+        self.plainTextEdit.setPlaceholderText(
+            QCoreApplication.translate("LogLevelParserPanel", PLACE_HOLDER_TEXT, None))
 
-        super().setupUi()
+    def __connectUi(self):
+        self.pushButton_reset.clicked.connect(self.__OnReset)
+        self.pushButton_cancel.clicked.connect(self.__OnCancel)
+        self.pushButton_apply.clicked.connect(self.__OnApply)
 
-    def retranslateUi(self):
-        super().retranslateUi()
-        self.setWindowTitle(QCoreApplication.translate("SetingDialog", u"log等级解析", None))
-        self.__plainTextEdit_parser.setPlaceholderText(QCoreApplication.translate("SetingDialog", PLACE_HOLDER_TEXT, None))
-        self._pushButton_apply.setText(QCoreApplication.translate("SetingDialog", u"解析", None))
+    def __OnReset(self):
+        self.plainTextEdit.clear()
 
-    def _reset(self):
-        self.__plainTextEdit_parser.clear()
-
-    def _cancel(self):
-        self._reset()
+    def __OnCancel(self):
+        self.__OnReset()
         self.close()
 
-    def _apply(self):
-        text = self.__plainTextEdit_parser.toPlainText()
+    def __OnApply(self):
+        text = self.plainTextEdit.toPlainText()
         if text == "":
             ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_PARSER_EMPTY_INPUT)
             return
