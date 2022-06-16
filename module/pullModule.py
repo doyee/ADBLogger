@@ -6,6 +6,7 @@ import gzip
 from re import *
 from utils.Utils import *
 from natsort import natsorted
+import functools
 
 LOG_PREFIX = "androidlog"
 OUTPUT_PREFIX = "android_logs_"
@@ -24,9 +25,23 @@ class PullModule(ToolModule):
         res = self._adb_manager.Pull(src, dst)
         return res
 
+    # applogcat-log.I210.20220518-205252.gz
+    # applogcat-log.I213.20220518-215049.gz
+    def SortByTimestamp(self, a, b):
+        time_pos = 2
+        time_a = a.split(".")[time_pos] # time_a: 20220518-205252
+        time_b = b.split(".")[time_pos] # time_b: 20220518-215049
+        if time_a < time_b:
+            return -1
+        if time_a > time_b:
+            return 1
+        return 0
+
     def ShortcutMerge(self, src):
         files = FindAllChildren(src)
-        files = natsorted(MatchFileNames(files, "applogcat-log.*.gz"))
+        # files = natsorted(MatchFileNames(files, "applogcat-log.*.gz"))
+        unordered_files = MatchFileNames(files, "applogcat-log.*.gz")
+        files = sorted(unordered_files,key=functools.cmp_to_key(self.SortByTimestamp))
         fileName = "%s%d_merged.txt" % (OUTPUT_PREFIX, GetTimestamp())
         if files is None or len(files) == 0:
             return ERROR_CODE_EMPTY_LOG_DIR
@@ -41,7 +56,9 @@ class PullModule(ToolModule):
 
     def Merge(self, src, dst):
         files = FindAllChildren(src)
-        files = natsorted(MatchFileNames(files, "applogcat-log.*.gz"))
+        # files = natsorted(MatchFileNames(files, "applogcat-log.*.gz"))
+        unordered_files = MatchFileNames(files, "applogcat-log.*.gz")
+        files = sorted(unordered_files,key=functools.cmp_to_key(self.SortByTimestamp))
         fileName = "%s%d_merged.txt" % (OUTPUT_PREFIX, GetTimestamp())
         if files is None or len(files) == 0:
             return ERROR_CODE_EMPTY_LOG_DIR
@@ -53,13 +70,13 @@ class PullModule(ToolModule):
             f.write(bytes("\n", encoding="utf8"))
         f.close()
         # TO-DO: check settings
-        self.__settingModule.LoadSettings()
-        if self.__settingModule.GetSetting(SETTING_OPEN_DIR):
-            StartDir(dst)
-        if self.__settingModule.GetSetting(SETTING_OPEN_FILE):
-            exe = self.__settingModule.GetSetting(SETTING_OPEN_FILE_EXE)
-            cmd = "\"%s\" \"%s\"" % (exe, file)
-            RunCmdAsync(cmd)
+        #self.__settingModule.LoadSettings()
+        #if self.__settingModule.GetSetting(SETTING_OPEN_DIR):
+            #StartDir(dst)
+        #if self.__settingModule.GetSetting(SETTING_OPEN_FILE):
+            #exe = self.__settingModule.GetSetting(SETTING_OPEN_FILE_EXE)
+            #cmd = "\"%s\" \"%s\"" % (exe, file)
+            #RunCmdAsync(cmd)
         return ERROR_CODE_SUCCESS
 
     def GetLastSelectedDir(self, type):
