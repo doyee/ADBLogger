@@ -4,7 +4,7 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication
 
-from ui.mainWindow import MainWindow
+from uilogic.mainWindow import MainWindow
 from utils.Utils import *
 from utils.defines import *
 from utils.UIUtils import *
