@@ -1,3 +1,5 @@
+from typing import Union
+
 from PyQt5.QtGui import QColor
 
 DEBUG = False
@@ -59,7 +61,7 @@ RUNNABLE_MAC = ".dmg"
 RUNNABLE_LINUX = ".deb"
 
 UI_VERSION = "1.0.0.0"
-MODULE_VERSION = "1.0.0.5"
+MODULE_VERSION = "1.0.0.6"
 DB_VERSION = 1
 VERSION = "1.0.0.6"
 
@@ -84,7 +86,7 @@ GIT_REPO = "adbLogcatTool"
 TOOLS_ROOT_DIR = "adbTools"
 TOOLS_DB_MANE = "adbTools.db"
 
-LIST_SELECTED_COLOR = QColor(0, 0, 255, 100)
+LIST_SELECTED_COLOR: Union[QColor, QColor] = QColor(0, 0, 255, 100)
 LIST_NORMAL_COLOR = QColor(255, 255, 255, 255)
 
 def ErrorCodeToMessage(errorCode):
