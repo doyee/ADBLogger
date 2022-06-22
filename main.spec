@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['ADBLogger.py'],
+    ['main.py'],
     pathex=['app_icons_rc.py'],
     binaries=[],
     datas=[],
@@ -28,7 +28,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='ADBLogger',
+    name='main',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
