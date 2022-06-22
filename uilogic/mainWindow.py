@@ -8,7 +8,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from module.adbManager import ADBManager
-from module.autoUpdate import AutoUpdate, UpdateDialog
+from module.autoUpdate import AutoUpdate
 from module.generalSetings import GeneralSettings
 from module.levelModule import LevelModule
 from module.logLevelParser import LogLevelParser
@@ -17,6 +17,8 @@ from ui.UIMainWindow import Ui_MainWindow as UIM
 from uilogic.logLevelParserPanel import LogLevelParserPanel
 from uilogic.logLevelTabFrame import LogLevelTabFrame
 from uilogic.logPullTabFrame import LogPullTabFrame
+from uilogic.aboutDialog import AboutDialog
+from uilogic.upgradeDialog import UpgradeDialog
 from utils.UIUtils import *
 from utils.Utils import *
 
@@ -26,19 +28,23 @@ TITLE_PREFIX = "AndroidLogs"
 class AutoUpdateThread(QThread):
     versionChecked = pyqtSignal(bool, str)
 
-    def __init__(self, module, parent=None):
+    def __init__(self, autoUpdate, parent=None):
         super().__init__(parent)
-        self.__module = module
+        self.__update = autoUpdate
         self.__isForce = False
 
     def SetIsForce(self, isForce):
         self.__isForce = isForce
 
+    def GetAutoUpdateInstance(self):
+        return self.__update
+
     def run(self) -> None:
-        hasNewVersion, latestVersion = self.__module.CheckUpdate(self.__isForce)
+        hasNewVersion, latestVersion = self.__update.CheckUpdate(self.__isForce)
         self.versionChecked.emit(hasNewVersion, latestVersion)
 
-class MainWindow(QMainWindow,UIM):
+
+class MainWindow(QMainWindow, UIM):
     class DeviceThread(threading.Thread):
         def __init__(self, adbManager, comboBox, callback, delay):
             threading.Thread.__init__(self)
@@ -70,11 +76,11 @@ class MainWindow(QMainWindow,UIM):
         self.__adbManager = ADBManager.get_instance()
         self.__deviceInfo = []
         self.__displaySize = GetWindowSize()
-        self.__autoUpdateModule = AutoUpdate(self)
-        self.__updateThread = AutoUpdateThread(self.__autoUpdateModule)
+        self.__autoUpdate = AutoUpdate()
+        self.__updateThread = AutoUpdateThread(self.__autoUpdate)
+        self.__autoUpgradeDialog = UpgradeDialog(self.__autoUpdate)
         self.__setupUi()
         self.__connectUi()
-
 
     def __buildTabs(self):
         settingModule = GeneralSettings()
@@ -97,10 +103,6 @@ class MainWindow(QMainWindow,UIM):
         self.__parserDialog = LogLevelParserPanel(LogLevelParser(self.level_tab_frame))
         self.__parserDialog.buildUp()
 
-    def __buildUpgrade(self):
-        windowSize = GetWindowSize()
-        self.__autoUpdateDialog = UpdateDialog(windowSize,self.__autoUpdateModule)
-
     def __buildStatusbar(self):
         self.statusbar = QStatusBar()
         self.statusbar.setObjectName(u"statusbar")
@@ -110,20 +112,22 @@ class MainWindow(QMainWindow,UIM):
         self.statusbar.addWidget(self.__latestVersion, 1)
         self.setStatusBar(self.statusbar)
 
+    def __buildAbout(self):
+        self.__aboutDialog = AboutDialog()
+        self.__aboutDialog.buildUp()
+
     def __setupUi(self):
         self.setupUi(self)
         self.__updateDevice()
         self.__buildTabs()
         self.__buildParser()
-        self.__buildUpgrade()
         self.__buildStatusbar()
+        self.__buildAbout()
 
     def show(self, isFirstTime):
         super().show()
         if isFirstTime:
             self.__parserDialog.show()
-
-        self.__autoUpdateDialog.SetIsForce(False)
         self.__updateThread.start()
 
     def __connectUi(self):
@@ -131,6 +135,7 @@ class MainWindow(QMainWindow,UIM):
         self.action_log_level_settings.triggered.connect(self.__onMenu)
         self.action_check_upgrade.triggered.connect(self.__onMenu)
         self.action_refresh_device_list.triggered.connect(self.__onMenu)
+        self.action_about.triggered.connect(self.__onMenu)
 
         self.__updateThread.versionChecked.connect(self.__onCheckUpdate)
         self.device_changed.connect(self.__onUSBStateChanged)
@@ -142,11 +147,12 @@ class MainWindow(QMainWindow,UIM):
             self.__parserDialog.show()
         elif (self.sender() == self.action_check_upgrade) and (not self.__isChecking):
             self.__isChecking = True
-            self.__autoUpdateDialog.SetIsForce(True)
             self.__updateThread.SetIsForce(True)
             self.__updateThread.start()
         elif self.sender() == self.action_refresh_device_list:
             self.__updateDevice()
+        elif self.sender() == self.action_about:
+            self.__aboutDialog.show()
 
     def __updateDevice(self, delay=0):
         sleep(delay)
@@ -156,7 +162,8 @@ class MainWindow(QMainWindow,UIM):
         if not self.__deviceInfo == None:
             infos = []
             for info in self.__deviceInfo:
-                infoStr = " %s: %s \t [Status:%s]" % (info[DEVICE_INFO_NAME], info[DEVICE_INFO_ID], info[DEVICE_INFO_STATUS])
+                infoStr = " %s: %s \t [Status:%s]" % (
+                info[DEVICE_INFO_NAME], info[DEVICE_INFO_ID], info[DEVICE_INFO_STATUS])
                 infos.append(infoStr)
             self.comboBox_device_list.addItems(infos)
         self.__onDeviceChanged()
@@ -176,7 +183,8 @@ class MainWindow(QMainWindow,UIM):
         if currentSelected == -1:
             title = TITLE_PREFIX
         else:
-            title = "%s - %s (%s)" % (TITLE_PREFIX, self.__deviceInfo[currentSelected][DEVICE_INFO_ID], self.__deviceInfo[currentSelected][DEVICE_INFO_STATUS])
+            title = "%s - %s (%s)" % (TITLE_PREFIX, self.__deviceInfo[currentSelected][DEVICE_INFO_ID],
+                                      self.__deviceInfo[currentSelected][DEVICE_INFO_STATUS])
         self.setWindowTitle(QCoreApplication.translate("MainWindow", title, None))
         self.__adbManager.SetSelectedDevice(currentSelected)
 
@@ -194,7 +202,7 @@ class MainWindow(QMainWindow,UIM):
 
     def __onCheckUpdate(self, hasNewVersion, latestVersion):
         if hasNewVersion:
-            self.__autoUpdateDialog.show(latestVersion)
+            self.__autoUpgradeDialog.show(latestVersion)
+
         self.__isChecking = False
         self.__latestVersion.setText("最新版本:%s" % latestVersion)
-
