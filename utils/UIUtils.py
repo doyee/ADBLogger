@@ -11,12 +11,12 @@ def GetWindowSize():
 def ShowMessageDialog(msgType, msg):
     if msgType == MESSAGE_TYPE_INFO:
         messageBox = QMessageBox(QMessageBox.Information, "提示", msg)
-        messageBox.setWindowIcon(QIcon('icon/icon.ico'))
+        messageBox.setWindowIcon(QIcon('icon/icon.resource'))
         messageBox.addButton(u"完成", QMessageBox.YesRole)
         messageBox.exec_()
     elif msgType == MESSAGE_TYPE_WARNING:
         messageBox = QMessageBox(QMessageBox.Warning, "警告", msg)
-        messageBox.setWindowIcon(QIcon('icon/icon.ico'))
+        messageBox.setWindowIcon(QIcon('icon/icon.resource'))
         messageBox.addButton(u"关闭", QMessageBox.YesRole)
         messageBox.exec_()
 
