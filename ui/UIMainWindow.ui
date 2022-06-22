@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>AndroidLogs</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../app_icons.qrc">
+    <normaloff>:/lable_icon/resource/app_icon.ico</normaloff>:/lable_icon/resource/app_icon.ico</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
@@ -144,6 +148,8 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../app_icons.qrc"/>
+ </resources>
  <connections/>
 </ui>
