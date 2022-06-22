@@ -11,6 +11,7 @@ class LogPullTabFrame(QFrame, UILog):
         super().__init__(parent)
         self._module = module
         self.__workingType = 1 << WORKING_TYPE_PULL_AND_MERGE
+        self.__loggingType = 1 << LoggingType.APP_LOG
 
     def buildUp(self):
         self.setupUi(self)
@@ -87,6 +88,18 @@ class LogPullTabFrame(QFrame, UILog):
         return dir
 
     def __onWork(self):
+        # check loggingType selected
+        if self.checkBox_applogcat.isChecked():
+            self.__loggingType |= 1 << LoggingType.APP_LOG
+        if self.checkBox_eventlogcat.isChecked():
+            self.__loggingType |= 1 << LoggingType.EVENTS_LOG
+        if self.checkBox_kmsgcat.isChecked():
+            self.__loggingType |= 1 << LoggingType.KMSG_LOG
+        if self.checkBox_rillogcat.isChecked():
+            self.__loggingType |= 1 << LoggingType.RIL_LOG
+
+        self._module.SetLoggingType(self.__loggingType)
+
         if self.lineEdit_dst.text() == "":
             ShowMessageDialog(MESSAGE_TYPE_WARNING, MESSAGE_STR_MERGE_DST_EMPTY)
             return
