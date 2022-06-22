@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="lable_icon">
     <file>resource/app_icon.svg</file>
+    <file>resource/app_icon.ico</file>
   </qresource>
 </RCC>
