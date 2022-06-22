@@ -1,6 +1,22 @@
 from typing import Union
 
 from PyQt5.QtGui import QColor
+from enum import IntEnum
+
+
+class LoggingType(IntEnum):
+    APP_LOG = 1
+    EVENTS_LOG = 2
+    KMSG_LOG = 3
+    RIL_LOG = 4
+
+
+LoggingDict = {
+    LoggingType.APP_LOG: "applogcat-log",
+    LoggingType.EVENTS_LOG: "eventslogcat-log",
+    LoggingType.KMSG_LOG: "kmsgcat-log",
+    LoggingType.RIL_LOG: "rillogcat-log"
+}
 
 DEBUG = False
 DEBUG_PRINT = True
@@ -61,9 +77,9 @@ RUNNABLE_MAC = ".dmg"
 RUNNABLE_LINUX = ".deb"
 
 UI_VERSION = "1.0.0.0"
-MODULE_VERSION = "1.0.0.6"
+MODULE_VERSION = "1.0.0.5"
 DB_VERSION = 1
-VERSION = "1.0.0.6"
+VERSION = "1.0.0.5"
 
 DEVICE_INFO_ID = "deviceId"
 DEVICE_INFO_NAME = "deviceName"
@@ -82,12 +98,12 @@ CAMX_OVERRIDE_SETTINGS_PATH = CAMX_OVERRIDE_SETTINGS_ROOT + CAMX_OVERRIDE_SETTIN
 GIT_ACCOUNT = "GiddensA"
 GIT_REPO = "adbLogcatTool"
 
-
 TOOLS_ROOT_DIR = "adbTools"
 TOOLS_DB_MANE = "adbTools.db"
 
 LIST_SELECTED_COLOR: Union[QColor, QColor] = QColor(0, 0, 255, 100)
 LIST_NORMAL_COLOR = QColor(255, 255, 255, 255)
+
 
 def ErrorCodeToMessage(errorCode):
     if errorCode == ERROR_CODE_SUCCESS:
