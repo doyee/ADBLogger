@@ -109,9 +109,9 @@
         <number>0</number>
        </property>
        <property name="text">
-        <string>  ADB Logger 是一款超轻量级日志手机整理工具,方便开发者在 MTK,Qualcomm 平台收集流水日志(android logs)。 
+        <string>  AndroidLogs 是一款超轻量级日志手机整理工具,方便开发者在 MTK,Qualcomm 平台收集流水日志(/data/log/android_logs)。
  
- 把零散的applogcat-log.*日志合并成单一的txt文件方便阅读，设置log等级直接应用到手机等。</string>
+ 把零散的.gz文件日志解压后合并成单一的.txt文件方便阅读，设置日志等级直接应用到手机等。</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
