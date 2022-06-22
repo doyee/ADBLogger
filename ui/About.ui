@@ -63,7 +63,7 @@
           <string>ADBLogger</string>
          </property>
          <property name="text">
-          <string>ADBLogger</string>
+          <string>AndroidLogs</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -81,7 +81,7 @@
           </font>
          </property>
          <property name="text">
-          <string>&lt;A href='https://github.com/doyee/ADBLogger'&gt; https://github.com/doyee/ADBLogger &lt;/a&gt;</string>
+          <string>&lt;A href='https://github.com/doyee/ADBLogger'&gt; https://github.com/doyee/AndroidLogs &lt;/a&gt;</string>
          </property>
          <property name="openExternalLinks">
           <bool>true</bool>
