@@ -15,6 +15,9 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(498, 373)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/lable_icon/resource/app_icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -103,3 +106,4 @@ class Ui_MainWindow(object):
         self.action_refresh_device_list.setText(_translate("MainWindow", "刷新设备列表"))
         self.action_check_upgrade.setText(_translate("MainWindow", "检查更新"))
         self.action_about.setText(_translate("MainWindow", "关于"))
+import app_icons_rc
