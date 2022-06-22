@@ -96,8 +96,8 @@ class Ui_aboutWiget(object):
         self.lable_name.setAccessibleName(_translate("aboutWiget", "ADBLogger"))
         self.lable_name.setText(_translate("aboutWiget", "AndroidLogs"))
         self.label_home_link.setText(_translate("aboutWiget", "<A href=\'https://github.com/doyee/ADBLogger\'> https://github.com/doyee/AndroidLogs </a>"))
-        self.label_description.setText(_translate("aboutWiget", "  ADB Logger 是一款超轻量级日志手机整理工具,方便开发者在 MTK,Qualcomm 平台收集流水日志(android logs)。 \n"
+        self.label_description.setText(_translate("aboutWiget", "  AndroidLogs 是一款超轻量级日志手机整理工具,方便开发者在 MTK,Qualcomm 平台收集流水日志(/data/log/android_logs)。\n"
 " \n"
-" 把零散的applogcat-log.*日志合并成单一的txt文件方便阅读，设置log等级直接应用到手机等。"))
+" 把零散的.gz文件日志解压后合并成单一的.txt文件方便阅读，设置日志等级直接应用到手机等。"))
         self.pushButton_ok.setText(_translate("aboutWiget", "确定"))
 import app_icons_rc
