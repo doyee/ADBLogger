@@ -19,6 +19,10 @@ class PullModule(ToolModule):
     def __init__(self, settingModule):
         super().__init__()
         self.__settingModule = settingModule
+        self.__loggingType = 1 << LoggingType.APP_LOG | 1 << LoggingType.RIL_LOG | 1 << LoggingType.EVENTS_LOG | 1 << LoggingType.KMSG_LOG
+
+    def SetLoggingType(self, type):
+        self.__loggingType = type
 
     def Pull(self, dst):
         src = ANDROID_LOGS_ROOT
@@ -38,14 +42,15 @@ class PullModule(ToolModule):
         return 0
 
     def ShortcutMerge(self, src):
-        files = FindAllChildren(src)
-        # files = natsorted(MatchFileNames(files, "applogcat-log.*.gz"))
-        unordered_files = MatchFileNames(files, "applogcat-log.*.gz")
+        return self.Merge(src, src)
+
+    def __MergeByFilter(self, files, filter, src,dst):
+        unordered_files = MatchFileNames(files, filter + ".*.gz")
         files = sorted(unordered_files,key=functools.cmp_to_key(self.SortByTimestamp))
-        fileName = "%s%d_merged.txt" % (OUTPUT_PREFIX, GetTimestamp())
+        fileName = "%s_%d_merged.txt" % (filter, GetTimestamp())
         if files is None or len(files) == 0:
             return ERROR_CODE_EMPTY_LOG_DIR
-        file = JoinPath(src, fileName)
+        file = JoinPath(dst, fileName)
         f = open(file, "ab+")
         for gz in files:
             g_file = gzip.GzipFile(JoinPath(src, gz)).read()
@@ -56,28 +61,13 @@ class PullModule(ToolModule):
 
     def Merge(self, src, dst):
         files = FindAllChildren(src)
-        # files = natsorted(MatchFileNames(files, "applogcat-log.*.gz"))
-        unordered_files = MatchFileNames(files, "applogcat-log.*.gz")
-        files = sorted(unordered_files,key=functools.cmp_to_key(self.SortByTimestamp))
-        fileName = "%s%d_merged.txt" % (OUTPUT_PREFIX, GetTimestamp())
-        if files is None or len(files) == 0:
-            return ERROR_CODE_EMPTY_LOG_DIR
-        file = JoinPath(dst, fileName)
-        f = open(file, "ab+")
-        for gz in files:
-            g_file = gzip.GzipFile(JoinPath(src, gz)).read()
-            f.write(g_file)
-            f.write(bytes("\n", encoding="utf8"))
-        f.close()
-        # TO-DO: check settings
-        #self.__settingModule.LoadSettings()
-        #if self.__settingModule.GetSetting(SETTING_OPEN_DIR):
-            #StartDir(dst)
-        #if self.__settingModule.GetSetting(SETTING_OPEN_FILE):
-            #exe = self.__settingModule.GetSetting(SETTING_OPEN_FILE_EXE)
-            #cmd = "\"%s\" \"%s\"" % (exe, file)
-            #RunCmdAsync(cmd)
-        return ERROR_CODE_SUCCESS
+        error = ERROR_CODE_EMPTY_LOG_DIR
+        for logType, logFilter in LoggingDict.items():
+            if self.__loggingType & 1 << logType:
+                # one of logFilter merged success mean Merge function success.
+                error *= self.__MergeByFilter(files,logFilter,src,dst)
+
+        return error
 
     def GetLastSelectedDir(self, type):
         info = SQLManager.QueryInfo()
