@@ -76,10 +76,10 @@ RUNNABLE_WIN = ".exe"
 RUNNABLE_MAC = ".dmg"
 RUNNABLE_LINUX = ".deb"
 
-UI_VERSION = "1.0.0.0"
-MODULE_VERSION = "1.0.0.5"
+UI_VERSION = "1.0.0.1"
+MODULE_VERSION = "1.0.0.7"
 DB_VERSION = 1
-VERSION = "1.0.0.5"
+VERSION = "1.0.0.7"
 
 DEVICE_INFO_ID = "deviceId"
 DEVICE_INFO_NAME = "deviceName"
@@ -95,11 +95,11 @@ else:
     ANDROID_LOGS_ROOT = "/storage/emulated/0/test/android_logs"
 CAMX_OVERRIDE_SETTINGS_PATH = CAMX_OVERRIDE_SETTINGS_ROOT + CAMX_OVERRIDE_SETTINGS
 
-GIT_ACCOUNT = "GiddensA"
-GIT_REPO = "adbLogcatTool"
+GIT_ACCOUNT = "doyee"
+GIT_REPO = "AndroidLogs"
 
 TOOLS_ROOT_DIR = "adbTools"
-TOOLS_DB_MANE = "adbTools.db"
+TOOLS_DB_NAME = "adbTools.db"
 
 LIST_SELECTED_COLOR: Union[QColor, QColor] = QColor(0, 0, 255, 100)
 LIST_NORMAL_COLOR = QColor(255, 255, 255, 255)
