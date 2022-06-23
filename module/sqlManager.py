@@ -33,7 +33,7 @@ class SQLManager(object):
         Conditions = ""
 
     def __init__(self):
-        path = os.path.join(os.path.join(GetAppDataDir(), TOOLS_ROOT_DIR), TOOLS_DB_MANE)
+        path = os.path.join(os.path.join(GetAppDataDir(), TOOLS_ROOT_DIR), TOOLS_DB_NAME)
         self.__db = sqlite3.connect(path, check_same_thread=False)
         self.__checkDBUpdates()
 
