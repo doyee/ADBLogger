@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>490</width>
-    <height>212</height>
+    <width>350</width>
+    <height>220</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,6 +15,18 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>350</width>
+    <height>220</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>350</width>
+    <height>220</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>关于</string>
@@ -60,7 +72,7 @@
           </font>
          </property>
          <property name="accessibleName">
-          <string>ADBLogger</string>
+          <string>AndroidLogs</string>
          </property>
          <property name="text">
           <string>AndroidLogs</string>
@@ -96,6 +108,24 @@
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="QLabel" name="label_description">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>330</width>
+         <height>90</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>330</width>
+         <height>90</height>
+        </size>
+       </property>
        <property name="frameShape">
         <enum>QFrame::Box</enum>
        </property>
@@ -109,9 +139,11 @@
         <number>0</number>
        </property>
        <property name="text">
-        <string>  AndroidLogs 是一款超轻量级日志手机整理工具,方便开发者在 MTK,Qualcomm 平台收集流水日志(/data/log/android_logs)。
+        <string>  ADB Logger 是一款超轻量级日志手机整理工具,方便开发者在 MTK,Qualcomm 平台收集流水日志(android logs)。 
  
- 把零散的.gz文件日志解压后合并成单一的.txt文件方便阅读，设置日志等级直接应用到手机等。</string>
+ 把零散的applogcat-log.*日志合并成单一的txt文件方便阅读，设置log等级直接应用到手机等。
+
+</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -159,6 +191,7 @@
  </widget>
  <resources>
   <include location="../app_icons.qrc"/>
+  <include location="C:/Users/dw0048866/.designer/app_icons.qrc"/>
  </resources>
  <connections>
   <connection>
