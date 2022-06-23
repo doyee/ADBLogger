@@ -1,17 +1,12 @@
 import os.path
-import sys
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication
-
-from uilogic.mainWindow import MainWindow
-from utils.Utils import *
-from utils.defines import *
-from utils.UIUtils import *
-from module.sqlManager import *
 from module.adbManager import *
 from module.settingDefines import *
 from module.shortcutModule import ShortcutModule
+from module.sqlManager import *
+from uilogic.mainWindow import MainWindow
+from utils.UIUtils import *
+
 
 def launchCheck():
     firstTimeFlag = False
@@ -34,6 +29,7 @@ def launchCheck():
     if firstTimeFlag:
         Init_DB()
     return firstTimeFlag
+
 
 if __name__ == '__main__':
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
