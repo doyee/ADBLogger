@@ -14,12 +14,14 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_aboutWiget(object):
     def setupUi(self, aboutWiget):
         aboutWiget.setObjectName("aboutWiget")
-        aboutWiget.resize(490, 212)
+        aboutWiget.resize(350, 220)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(aboutWiget.sizePolicy().hasHeightForWidth())
         aboutWiget.setSizePolicy(sizePolicy)
+        aboutWiget.setMinimumSize(QtCore.QSize(350, 220))
+        aboutWiget.setMaximumSize(QtCore.QSize(350, 220))
         aboutWiget.setAutoFillBackground(True)
         self.gridLayout = QtWidgets.QGridLayout(aboutWiget)
         self.gridLayout.setObjectName("gridLayout")
@@ -61,6 +63,13 @@ class Ui_aboutWiget(object):
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.label_description = QtWidgets.QLabel(aboutWiget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_description.sizePolicy().hasHeightForWidth())
+        self.label_description.setSizePolicy(sizePolicy)
+        self.label_description.setMinimumSize(QtCore.QSize(330, 90))
+        self.label_description.setMaximumSize(QtCore.QSize(330, 90))
         self.label_description.setFrameShape(QtWidgets.QFrame.Box)
         self.label_description.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.label_description.setLineWidth(1)
@@ -93,11 +102,13 @@ class Ui_aboutWiget(object):
     def retranslateUi(self, aboutWiget):
         _translate = QtCore.QCoreApplication.translate
         aboutWiget.setWindowTitle(_translate("aboutWiget", "关于"))
-        self.lable_name.setAccessibleName(_translate("aboutWiget", "ADBLogger"))
+        self.lable_name.setAccessibleName(_translate("aboutWiget", "AndroidLogs"))
         self.lable_name.setText(_translate("aboutWiget", "AndroidLogs"))
         self.label_home_link.setText(_translate("aboutWiget", "<A href=\'https://github.com/doyee/ADBLogger\'> https://github.com/doyee/AndroidLogs </a>"))
-        self.label_description.setText(_translate("aboutWiget", "  AndroidLogs 是一款超轻量级日志手机整理工具,方便开发者在 MTK,Qualcomm 平台收集流水日志(/data/log/android_logs)。\n"
+        self.label_description.setText(_translate("aboutWiget", "  ADB Logger 是一款超轻量级日志手机整理工具,方便开发者在 MTK,Qualcomm 平台收集流水日志(android logs)。 \n"
 " \n"
-" 把零散的.gz文件日志解压后合并成单一的.txt文件方便阅读，设置日志等级直接应用到手机等。"))
+" 把零散的applogcat-log.*日志合并成单一的txt文件方便阅读，设置log等级直接应用到手机等。\n"
+"\n"
+""))
         self.pushButton_ok.setText(_translate("aboutWiget", "确定"))
 import app_icons_rc
