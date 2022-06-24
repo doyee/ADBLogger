@@ -44,10 +44,10 @@ class PullModule(ToolModule):
     def ShortcutMerge(self, src):
         return self.Merge(src, src)
 
-    def __MergeByFilter(self, files, filter, src,dst):
+    def __MergeByFilter(self, files, filter, src,dst, prefixIndex):
         unordered_files = MatchFileNames(files, filter + ".*.gz")
         files = sorted(unordered_files,key=functools.cmp_to_key(self.SortByTimestamp))
-        fileName = "%s_%d_merged.txt" % (filter, GetTimestamp())
+        fileName = "%s._%s_merged.txt" % (prefixIndex, filter)
         if files is None or len(files) == 0:
             return ERROR_CODE_EMPTY_LOG_DIR
         file = JoinPath(dst, fileName)
@@ -61,13 +61,16 @@ class PullModule(ToolModule):
 
     def Merge(self, src, dst):
         files = FindAllChildren(src)
-        error = ERROR_CODE_EMPTY_LOG_DIR
+        res = ERROR_CODE_EMPTY_LOG_DIR
+
+        prefixIndex = 0
         for logType, logFilter in LoggingDict.items():
+            prefixIndex = prefixIndex + 1
             if self.__loggingType & 1 << logType:
                 # one of logFilter merged success mean Merge function success.
-                error *= self.__MergeByFilter(files,logFilter,src,dst)
+                res *= self.__MergeByFilter(files, logFilter, src, dst, prefixIndex)
 
-        return error
+        return res
 
     def GetLastSelectedDir(self, type):
         info = SQLManager.QueryInfo()
