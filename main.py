@@ -23,7 +23,7 @@ def launchCheck():
         firstTimeFlag = True
     else:
         # 3. check db
-        path = os.path.join(path, TOOLS_DB_MANE)
+        path = os.path.join(path, TOOLS_DB_NAME)
         if not IsDbExist(path):
             firstTimeFlag = True
     if firstTimeFlag:
