@@ -86,9 +86,8 @@ class AutoUpdate(QObject):
         self.__db.Update(queryInfo)
 
     def __checkVersion(self, version, isForce):
-        v = re.findall("\d+.\d+.\d+.\d+", version)[0]
-        latestVersion = v.rsplit('.')
-        curVersion = VERSION.rsplit(".")
+        v = re.findall("\d+.\d+", version)[0]
+        currVersion = VERSION
 
         queryInfo = SQLManager.QueryInfo()
         queryInfo.Table = settingTable.Table
@@ -101,13 +100,7 @@ class AutoUpdate(QObject):
                 return True, v
             return False, v
 
-        if (latestVersion[0] > curVersion[0]) \
-                or (latestVersion[0] == curVersion[0] and latestVersion[1] > curVersion[1]) \
-                or (latestVersion[0] == curVersion[0] and latestVersion[1] == curVersion[1] and latestVersion[2] >
-                    curVersion[2]) \
-                or (latestVersion[0] == curVersion[0] and latestVersion[1] == curVersion[1] and latestVersion[2] ==
-                    curVersion[2] and latestVersion[3] > curVersion[3]):
-
+        if v > currVersion:
             return True, v
         return False, v
 
