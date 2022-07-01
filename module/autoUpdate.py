@@ -8,7 +8,7 @@ from utils.Utils import *
 from module.sqlManager import SQLManager
 from module.table import settingTable
 
-TIMEOUT = 20 # sec
+TIMEOUT = 100 # sec
 GIT_API_URL = "https://api.github.com/repos/%s/%s/releases/latest" % (GIT_ACCOUNT, GIT_REPO)
 
 
