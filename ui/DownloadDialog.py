@@ -31,7 +31,7 @@ class Ui_DownloadDialog(object):
         self.label.setObjectName("label")
         self.verticalLayout.addWidget(self.label)
         self.progressBar = QtWidgets.QProgressBar(DownloadDialog)
-        self.progressBar.setProperty("value", 24)
+        self.progressBar.setProperty("value", 0)
         self.progressBar.setObjectName("progressBar")
         self.verticalLayout.addWidget(self.progressBar)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
