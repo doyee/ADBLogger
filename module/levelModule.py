@@ -1,13 +1,31 @@
 from module.sqlManager import SQLManager
-from module.toolModule import ToolModule
 from module.table import *
-
-from utils.defines import *
+from module.toolModule import ToolModule
 from utils.Utils import *
 
 LOG_GROUPS = ["overrideLogLevels", "CamxLogDebug", "CamxLogError", "CamxLogWarning", "CamxLogConfig", "CamxLogInfo", "CamxLogVerbose", "CamxLogCoreCfg"]
 OVERRIDE_LOG_MASK = ["Error", "Warning", "Config", "Info", "Dump", "Verbose", "Log", "Core Config"]
-LOG_MASK_ENABLE = [("System Log", True, "systemLogEnable"), ("Offline Log", False, "enableAsciiLogging"), ("DRQ Log", False, "logDRQEnable"), ("Metadata Log", False, "logMetaEnable")]
+LOG_ENABLE_MASK = [("System Log", True, "systemLogEnable"), ("Offline Log", False, "enableAsciiLogging"), ("DRQ Log", False, "logDRQEnable"), ("Metadata Log", False, "logMetaEnable")]
+
+def GetLogKeyByGroup(group):
+    if group.startswith("Camx"):
+        key = group.removeprefix("Camx")
+        if key is not None:
+            key += "Mask"
+            key = key.replace('Log', 'log')
+    else:
+        key = group
+    return key
+
+def GetLogGroupByKey(groupKey):
+    if groupKey.startswith("log"):
+        group = groupKey.replace('log', 'Log')
+        if group is not None:
+            group = "Camx" + group.replace("Mask", "")
+    else:
+        group = groupKey
+    return group
+
 class LogMaskSelectionListener(object):
     @abstractmethod
     def onLogGroupSelectionChanged(self, isEmpty):
@@ -18,7 +36,7 @@ class LevelModule(ToolModule):
     def __init__(self):
         super().__init__()
         self.__camxLogMasks = None
-        self.__enableMask = LOG_MASK_ENABLE.copy()
+        self.__enableMask = LOG_ENABLE_MASK.copy()
         self.__selection = {}
         self.__listener = None
 
@@ -39,7 +57,7 @@ class LevelModule(ToolModule):
                 break
 
     def ResetEnableLogMask(self):
-        self.__enableMask = LOG_MASK_ENABLE.copy()
+        self.__enableMask = LOG_ENABLE_MASK.copy()
         return self.__enableMask
 
     def SelectGroup(self, group):
@@ -99,13 +117,15 @@ class LevelModule(ToolModule):
         for group in LOG_GROUPS:
             try:
                 masks = self.__selection[group]
-                selected.append("%s=%#x" % (group, self.__calculate(group == LOG_GROUPS[0], masks)))
+                groupKey = GetLogKeyByGroup(group)
+                selected.append("%s=%#x" % (groupKey, self.__calculate(group == LOG_GROUPS[0], masks)))
             except:
                 pass
         return selected
 
     def GetSelectedGroup(self, text):
         group = text[:text.find("=")]
+        group = GetLogGroupByKey(group)
         return LOG_GROUPS.index(group)
 
     def GetSelectedGroups(self):
@@ -137,6 +157,7 @@ class LevelModule(ToolModule):
         for line in loaded:
             setting = line.rsplit("=")
             try:
+                setting[0] = GetLogGroupByKey(setting[0])
                 if setting[0] in LOG_GROUPS:
                     bits = HexToBits(setting[1].replace("\n", ""))
                     self.__selection[setting[0]] = []
@@ -148,7 +169,11 @@ class LevelModule(ToolModule):
                 else:
                     for i in range(len(self.__enableMask)):
                         if setting[0] == self.__enableMask[i][2]:
-                            value = True if setting[1].replace("\n", "").upper() == "TRUE" else False
+                            tmpValue = setting[1].replace("\n", "").upper()
+                            if tmpValue == "TRUE" or tmpValue == "1":
+                                value = True
+                            else:
+                                value = False
                             self.__enableMask[i] = (self.__enableMask[i][0], value, self.__enableMask[i][2])
                             break
             except Exception as e:
@@ -160,6 +185,9 @@ class LevelModule(ToolModule):
         IF_Print("log level selected: %s" % self.__selection)
         IF_Print("log level eneabled: %s" % self.__enableMask)
         return ERROR_CODE_SUCCESS
+
+    def RemoveSettingsFile(self):
+        RemoveFile(CAMX_OVERRIDE_SETTINGS_PATH)
 
     def DropSettingsFromFile(self, path=None):
         if path is not None:
@@ -206,7 +234,10 @@ class LevelModule(ToolModule):
         enabled = []
         for enable in self.__enableMask:
             print(enable)
-            enabled.append("%s=%s" % (enable[2], str(enable[1]).upper()))
+            if enable[2] == "enableAsciiLogging":
+                enabled.append("%s=%d" % (enable[2], enable[1] == True))
+            else:
+                enabled.append("%s=%s" % (enable[2], str(enable[1]).upper()))
         return enabled
 
     def __parseLogSettingsFile(self, lines, isExclude):
@@ -214,7 +245,8 @@ class LevelModule(ToolModule):
         for line in lines:
             flag = True
             for logMask in LOG_GROUPS:
-                keyWord = logMask + "="
+                keyWord = GetLogKeyByGroup(logMask)
+                keyWord = keyWord + "="
                 if line.count(keyWord) > 0:
                     flag = False
                     break
@@ -222,7 +254,7 @@ class LevelModule(ToolModule):
                 if not isExclude:
                     toReturn.append(line)
                 continue
-            for des, value, logMask in LOG_MASK_ENABLE:
+            for des, value, logMask in LOG_ENABLE_MASK:
                 keyWord = logMask + "="
                 if line.count(keyWord) > 0:
                     flag = False
