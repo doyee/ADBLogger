@@ -3,28 +3,9 @@ from module.table import *
 from module.toolModule import ToolModule
 from utils.Utils import *
 
-LOG_GROUPS = ["overrideLogLevels", "CamxLogDebug", "CamxLogError", "CamxLogWarning", "CamxLogConfig", "CamxLogInfo", "CamxLogVerbose", "CamxLogCoreCfg"]
+LOG_GROUPS = ["overrideLogLevels", "logDebugMask", "logWarningMask", "logConfigMask", "logInfoMask", "logVerboseMask", "logCoreCfgMask"]
 OVERRIDE_LOG_MASK = ["Error", "Warning", "Config", "Info", "Dump", "Verbose", "Log", "Core Config"]
 LOG_ENABLE_MASK = [("System Log", True, "systemLogEnable"), ("Offline Log", False, "enableAsciiLogging"), ("DRQ Log", False, "logDRQEnable"), ("Metadata Log", False, "logMetaEnable")]
-
-def GetLogKeyByGroup(group):
-    if group.startswith("Camx"):
-        key = group.removeprefix("Camx")
-        if key is not None:
-            key += "Mask"
-            key = key.replace('Log', 'log')
-    else:
-        key = group
-    return key
-
-def GetLogGroupByKey(groupKey):
-    if groupKey.startswith("log"):
-        group = groupKey.replace('log', 'Log')
-        if group is not None:
-            group = "Camx" + group.replace("Mask", "")
-    else:
-        group = groupKey
-    return group
 
 class LogMaskSelectionListener(object):
     @abstractmethod
@@ -117,15 +98,13 @@ class LevelModule(ToolModule):
         for group in LOG_GROUPS:
             try:
                 masks = self.__selection[group]
-                groupKey = GetLogKeyByGroup(group)
-                selected.append("%s=%#x" % (groupKey, self.__calculate(group == LOG_GROUPS[0], masks)))
+                selected.append("%s=%#x" % (group, self.__calculate(group == LOG_GROUPS[0], masks)))
             except:
                 pass
         return selected
 
     def GetSelectedGroup(self, text):
         group = text[:text.find("=")]
-        group = GetLogGroupByKey(group)
         return LOG_GROUPS.index(group)
 
     def GetSelectedGroups(self):
@@ -157,7 +136,6 @@ class LevelModule(ToolModule):
         for line in loaded:
             setting = line.rsplit("=")
             try:
-                setting[0] = GetLogGroupByKey(setting[0])
                 if setting[0] in LOG_GROUPS:
                     bits = HexToBits(setting[1].replace("\n", ""))
                     self.__selection[setting[0]] = []
@@ -245,8 +223,7 @@ class LevelModule(ToolModule):
         for line in lines:
             flag = True
             for logMask in LOG_GROUPS:
-                keyWord = GetLogKeyByGroup(logMask)
-                keyWord = keyWord + "="
+                keyWord = logMask + "="
                 if line.count(keyWord) > 0:
                     flag = False
                     break
